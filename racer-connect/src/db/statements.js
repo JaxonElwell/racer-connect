@@ -34,5 +34,3 @@ function getOrganization(id) {
     const row = db.prepare(sql).get(id)
     return row
 }
-
-console.log(getOrganization(7))
