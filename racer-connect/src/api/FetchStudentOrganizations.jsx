@@ -5,7 +5,7 @@ const FetchStudentOrganizations = () => {
     const [StudentOrganizations, setStudentOrganizations] = useState([]);
     
     useEffect(() => {
-        axios.get('http://localhost:5000/api/StudentOrganizations')
+        axios.get('/api/StudentOrganizations')
             .then(response => {
                 setStudentOrganizations(response.data.data);
             })

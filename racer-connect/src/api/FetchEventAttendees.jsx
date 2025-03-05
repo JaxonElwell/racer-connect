@@ -5,7 +5,7 @@ const FetchEventAttendees = () => {
     const [EventAttendees, setEventAttendees] = useState([]);
     
     useEffect(() => {
-        axios.get('http://localhost:5000/api/EventAttendees')
+        axios.get('/api/EventAttendees')
             .then(response => {
                 setEventAttendees(response.data.data);
             })

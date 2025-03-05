@@ -5,7 +5,7 @@ const FetchUsers = () => {
     const [Users, setUsers] = useState([]);
     
     useEffect(() => {
-        axios.get('http://localhost:5000/api/Users')
+        axios.get('/api/Users')
             .then(response => {
                 setUsers(response.data.data);
             })

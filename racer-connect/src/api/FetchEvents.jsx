@@ -5,7 +5,7 @@ const FetchEvents = () => {
     const [Events, setEvents] = useState([]);
     
     useEffect(() => {
-        axios.get('http://localhost:5000/api/Events')
+        axios.get('/api/Events')
             .then(response => {
                 setEvents(response.data.data);
             })
