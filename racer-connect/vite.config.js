@@ -8,4 +8,24 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target :'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('proxy error', err);
+          });
+          proxy.on('proxyReq', (proxyReq, _req, _res) => {
+            console.log('Sending request to the target:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, _req, _res) => {
+            console.log('Recieved response from the target:', proxyRes.statusCode, req.url);
+          });
+        }
+      }
+    }
+  }
 })
