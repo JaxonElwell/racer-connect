@@ -1,11 +1,9 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import axios from 'axios';
 
-const url = 'http://localhost:5000/api/jobs';
-
-const GetStudentOrganizations = () => {
+const FetchStudentOrganizations = () => {
     const [StudentOrganizations, setStudentOrganizations] = useState([]);
-
+    
     useEffect(() => {
         axios.get('http://localhost:5000/api/StudentOrganizations')
             .then(response => {
@@ -16,7 +14,7 @@ const GetStudentOrganizations = () => {
             });
     }, []);
 
-    return StudentOrganizations
+    return StudentOrganizations;
 }
 
-export default DatabaseAPI
+export default FetchStudentOrganizations
