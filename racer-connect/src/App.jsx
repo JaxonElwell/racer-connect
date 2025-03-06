@@ -49,24 +49,18 @@ function App() {
     <Layout>
       <h1 className="text-3xl font-bold text-center">Welcome to Racer Connect</h1>
       
-       {/* Buttons Section */}
-       <div className="mt-4 flex justify-center items-center w-full px-4 sm:px-8">
+      {/* Buttons Section */}
+      <div className="mt-4 flex justify-center items-center w-full px-4 sm:px-8">
         <div className="bg-white rounded-lg p-8 shadow-lg w-full max-w-7xl">
           <div className="flex justify-between space-x-4 w-full">
-            <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/4">
+            <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3">
               Organize an event
             </button>
-            <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/4">
+            <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3">
               Find events
             </button>
-            <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/4">
+            <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3">
               Find organizations
-            </button>
-            <button
-              className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/4"
-              onClick={() => handleOpenModal(1)}
-            >
-              Test Open Organization Page
             </button>
           </div>
         </div>
@@ -120,7 +114,7 @@ function App() {
           </div>
 
           {/* Organizations Container */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-4">
             {organizations.length > 0 ? (
               organizations.map((org) => (
                 <div 
@@ -142,6 +136,22 @@ function App() {
             ) : (
               <p className="text-gray-700">No organizations found.</p>
             )}
+
+            {/* Dummy Organization */}
+            <div 
+              className="bg-gray-100 rounded-lg p-4 flex items-center cursor-pointer hover:bg-gray-200 transition"
+              onClick={() => handleOpenModal(1)} // Hardcoded ID for testing
+            >
+              <img 
+                src="defaultOrg.jpg" 
+                alt="Dummy Organization" 
+                className="rounded-lg w-20 h-20 mr-4"
+              />
+              <div>
+                <h3 className="font-bold text-lg text-gray-900">Dummy Organization</h3>
+                <p className="text-sm text-gray-700">This is a dummy organization for testing purposes.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
