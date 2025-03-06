@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import tailwindcss from '@tailwindcss/vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -11,7 +11,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target :'http://localhost:5000',
+        target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
         configure: (proxy, _options) => {
@@ -19,13 +19,13 @@ export default defineConfig({
             console.log('proxy error', err);
           });
           proxy.on('proxyReq', (proxyReq, _req, _res) => {
-            console.log('Sending request to the target:', req.method, req.url);
+            console.log('Sending request to the target:', _req.method, _req.url);
           });
           proxy.on('proxyRes', (proxyRes, _req, _res) => {
-            console.log('Recieved response from the target:', proxyRes.statusCode, req.url);
+            console.log('Received response from the target:', proxyRes.statusCode, _req.url);
           });
         }
       }
     }
   }
-})
+});
