@@ -1,7 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from './Layout';
+import OrgModal from './OrgModal';
 
 function App() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrganization, setSelectedOrganization] = useState(null);
+
+  const testOrganization = {
+    name: 'Test Organization',
+    description: 'This is a test organization for demonstration purposes.',
+    image: 'testOrgImage.jpg', // Replace with the actual image path if available
+    miscInfo: 'Additional information about the test organization.',
+  };
+
+  const handleOpenModal = () => {
+    setSelectedOrganization(testOrganization);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedOrganization(null);
+  };
+
   return (
     <Layout>
       <h1 className="text-3xl font-bold text-center">Welcome to Racer Connect</h1>
@@ -18,6 +39,12 @@ function App() {
             </button>
             <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-full">
               Find organizations
+            </button>
+            <button
+              className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-full"
+              onClick={handleOpenModal}
+            >
+              Test Open Organization Page
             </button>
           </div>
         </div>
@@ -67,7 +94,9 @@ function App() {
           </div>
         </div>
       </div>
-      
+
+      {/* Organization Modal */}
+      <OrgModal isOpen={isModalOpen} onClose={handleCloseModal} organization={selectedOrganization} />
     </Layout>
   );
 }
