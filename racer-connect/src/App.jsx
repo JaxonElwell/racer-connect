@@ -74,7 +74,7 @@ function App() {
             <a href="#" className="text-gray-600 hover:underline">See All</a>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-100 rounded-lg p-4 flex items-center">
+            <div className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105">
               <img 
                 src="bgClub.jpg" 
                 alt="Event Thumbnail" 
@@ -87,7 +87,7 @@ function App() {
                 <p className="text-sm text-gray-700"><strong>📍 Waterfield Breezeway</strong></p>
               </div>
             </div>
-            <div className="bg-gray-100 rounded-lg p-4 flex items-center">
+            <div className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105">
               <img 
                 src="CASzBci.jpeg" 
                 alt="Event Thumbnail" 
@@ -116,10 +116,10 @@ function App() {
           {/* Organizations Container */}
           <div className="flex flex-col gap-4">
             {organizations.length > 0 ? (
-              organizations.map((org) => (
+              organizations.slice(0, 7).map((org) => (
                 <div 
                   key={org.id} 
-                  className="bg-gray-100 rounded-lg p-4 flex items-center cursor-pointer hover:bg-gray-200 transition"
+                  className="bg-gray-100 rounded-lg p-4 flex items-center cursor-pointer hover:bg-gray-200 transition hover:scale-105"
                   onClick={() => handleOpenModal(org.id)}
                 >
                   <img 
