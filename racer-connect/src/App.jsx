@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Layout from './Layout';
 import OrgModal from './OrgModal';
+import Form from './MultiPageForm/Form';
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedOrganization, setSelectedOrganization] = useState(null);
   const [organizations, setOrganizations] = useState([]);
   const [error, setError] = useState(null);
@@ -45,6 +47,10 @@ function App() {
     setError(null);
   };
 
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+  };
+
   return (
     <Layout>
       <h1 className="text-3xl font-bold text-center">Welcome to Racer Connect</h1>
@@ -53,7 +59,10 @@ function App() {
       <div className="mt-4 flex justify-center items-center w-full px-4 sm:px-8">
         <div className="bg-white rounded-lg p-8 shadow-lg w-full max-w-7xl">
           <div className="flex justify-between space-x-4 w-full">
-            <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3">
+            <button
+              className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3"
+              onClick={() => setIsFormOpen(true)}
+            >
               Organize an event
             </button>
             <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3">
@@ -65,6 +74,22 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* Multi-Page Form */}
+      {isFormOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          {/* Background Overlay */}
+          <div
+            className="absolute inset-0 bg-black opacity-60"
+            onClick={handleCloseForm} // Close the form when clicking outside
+          ></div>
+
+          {/* Form Container */}
+          <div className="relative bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl z-10">
+            <Form onClose={handleCloseForm} />
+          </div>
+        </div>
+      )}
 
       {/* My Events Section */}
       <div className="mt-8 px-4 sm:px-8 flex justify-center w-full">
@@ -158,6 +183,9 @@ function App() {
 
       {/* Organization Modal */}
       <OrgModal isOpen={isModalOpen} onClose={handleCloseModal} organization={selectedOrganization} />
+
+      {/* Multi-Page Form */}
+      {isFormOpen && <Form onClose={handleCloseForm} />}
 
       {/* Error Modal */}
       {error && (
