@@ -2,7 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const session = require('express-session');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-require('dotenv').config(); // Load environment variables
+require('dotenv').config(); 
 
 const router = express.Router();
 
@@ -34,7 +34,7 @@ router.get('/google',
 router.get('/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
-        res.redirect('http://localhost:5174/dashboard'); // Redirect user to dashboard after successful login
+        res.redirect('http://localhost:5174/dashboard'); 
     }
 );
 
@@ -42,7 +42,7 @@ router.get('/google/callback',
 router.get('/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) {
-            return next(err); // Pass error to global error handler
+            return next(err); 
         }
         req.session.destroy((err) => {
             if (err) {
