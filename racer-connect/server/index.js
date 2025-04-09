@@ -95,6 +95,25 @@ app.post('/api/StudentOrganizations', (req, res) => {
     }
 });
 
+// POST new event
+app.post('/api/Events', (req, res) => {
+    const { organization_id, name, event_date, location, description, image } = req.body;
+    if (!organization_id || !name || !event_date || !location) {
+        res.status(400).send('organization_id, name, event_date, and location cannot be null');
+    } else {
+        const sql = 'INSERT INTO Events(organization_id, name, event_date, location, description, image) VALUES (?, ?, ?, ?, ?, ?)';
+        db.run(sql, [organization_id, name, event_date, location, description, image], function (err) {
+            if (err) {
+                console.error(err.message);
+                res.status(500).send('Internal server error');
+            } else {
+                const id = this.lastID;
+                res.status(201).send({ id, organization_id, name, event_date, location, description, image });
+            }
+        });
+    }
+});
+
 // PUT update organization by id
 app.put('/api/StudentOrganizations/:id', (req, res) => {
     const { id } = req.params;
@@ -116,6 +135,27 @@ app.put('/api/StudentOrganizations/:id', (req, res) => {
     }
 });
 
+// PUT update event by id
+app.put('/api/Events/:id', (req, res) => {
+    const { id } = req.params;
+    const { organization_id, name, event_date, location, description, image } = req.body;
+    if (!organization_id || !name || !event_date || !location) {
+        res.status(400).send('name and category cannot be null');
+    } else {
+        const sql = 'UPDATE Events SET organization_id = ?, name = ?, event_date = ?, location = ?, description = ?, image = ? WHERE id = ?';
+        db.run(sql, [organization_id, name, event_date, location, description, image, id], function (err) {
+            if (err) {
+                console.error(err.message);
+                res.status(500).send('Internal server error');
+            } else if (this.changes === 0) {
+                res.status(404).send('Event not found');
+            } else {
+                res.status(200).send({ id, organization_id, name, event_date, location, description, image });
+            }
+        });
+    }
+});
+
 // DELETE organization by id
 app.delete('/api/StudentOrganizations/:id', (req, res) => {
     const { id } = req.params;
@@ -126,6 +166,22 @@ app.delete('/api/StudentOrganizations/:id', (req, res) => {
             res.status(500).send('Internal server error');
         } else if (this.changes === 0) {
             res.status(404).send('Organization not found');
+        } else {
+            res.status(204).send();
+        }
+    });
+});
+
+// DELETE event by id
+app.delete('/api/Events/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = 'DELETE FROM Events WHERE id = ?';
+    db.run(sql, [id], function (err) {
+        if (err) {
+            console.error(err.message);
+            res.status(500).send('Internal server error');
+        } else if (this.changes === 0) {
+            res.status(404).send('Event not found');
         } else {
             res.status(204).send();
         }
