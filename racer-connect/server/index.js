@@ -101,7 +101,7 @@ app.post('/api/Events', (req, res) => {
     if (!organization_id || !name || !event_date || !location) {
         res.status(400).send('organization_id, name, event_date, and location cannot be null');
     } else {
-        const sql = 'INSERT INTO StudentOrganizations(organization_id, name, event_date, location, description, image) VALUES (?, ?, ?, ?, ?, ?)';
+        const sql = 'INSERT INTO Events(organization_id, name, event_date, location, description, image) VALUES (?, ?, ?, ?, ?, ?)';
         db.run(sql, [organization_id, name, event_date, location, description, image], function (err) {
             if (err) {
                 console.error(err.message);
@@ -142,13 +142,13 @@ app.put('/api/Events/:id', (req, res) => {
     if (!organization_id || !name || !event_date || !location) {
         res.status(400).send('name and category cannot be null');
     } else {
-        const sql = 'UPDATE StudentOrganizations SET organization_id = ?, name = ?, event_date = ?, location = ?, description = ?, image = ? WHERE id = ?';
+        const sql = 'UPDATE Events SET organization_id = ?, name = ?, event_date = ?, location = ?, description = ?, image = ? WHERE id = ?';
         db.run(sql, [organization_id, name, event_date, location, description, image, id], function (err) {
             if (err) {
                 console.error(err.message);
                 res.status(500).send('Internal server error');
             } else if (this.changes === 0) {
-                res.status(404).send('Organization not found');
+                res.status(404).send('Event not found');
             } else {
                 res.status(200).send({ id, organization_id, name, event_date, location, description, image });
             }
