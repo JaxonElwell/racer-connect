@@ -135,6 +135,27 @@ app.put('/api/StudentOrganizations/:id', (req, res) => {
     }
 });
 
+// PUT update event by id
+app.put('/api/Events/:id', (req, res) => {
+    const { id } = req.params;
+    const { organization_id, name, event_date, location, description, image } = req.body;
+    if (!organization_id || !name || !event_date || !location) {
+        res.status(400).send('name and category cannot be null');
+    } else {
+        const sql = 'UPDATE StudentOrganizations SET organization_id = ?, name = ?, event_date = ?, location = ?, description = ?, image = ? WHERE id = ?';
+        db.run(sql, [organization_id, name, event_date, location, description, image, id], function (err) {
+            if (err) {
+                console.error(err.message);
+                res.status(500).send('Internal server error');
+            } else if (this.changes === 0) {
+                res.status(404).send('Organization not found');
+            } else {
+                res.status(200).send({ id, organization_id, name, event_date, location, description, image });
+            }
+        });
+    }
+});
+
 // DELETE organization by id
 app.delete('/api/StudentOrganizations/:id', (req, res) => {
     const { id } = req.params;
