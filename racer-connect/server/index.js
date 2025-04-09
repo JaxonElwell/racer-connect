@@ -172,6 +172,22 @@ app.delete('/api/StudentOrganizations/:id', (req, res) => {
     });
 });
 
+// DELETE event by id
+app.delete('/api/Events/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = 'DELETE FROM Events WHERE id = ?';
+    db.run(sql, [id], function (err) {
+        if (err) {
+            console.error(err.message);
+            res.status(500).send('Internal server error');
+        } else if (this.changes === 0) {
+            res.status(404).send('Event not found');
+        } else {
+            res.status(204).send();
+        }
+    });
+});
+
 // start the server
 const PORT = 5000;
 app.listen(PORT, () => {
