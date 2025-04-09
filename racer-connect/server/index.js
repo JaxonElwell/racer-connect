@@ -2,10 +2,26 @@ const express = require('express');
 const app = express();
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
+const session = require('express-session');
+const passport = require('passport');
+const authRoutes = require('./auth');
 
 // middleware
 app.use(cors());
 app.use(express.json());
+
+app.use(express.static('src')); 
+
+// OAuth Keys
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+   saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use('/auth', authRoutes);
 
 // database setup
 const db = new sqlite3.Database('./devdb.sqlite', (err) => {
@@ -191,5 +207,5 @@ app.delete('/api/Events/:id', (req, res) => {
 // start the server
 const PORT = 5000;
 app.listen(PORT, () => {
-    console.log('Server running on http://localhost:5000');
+    console.log('Server running on http://localhost:5000/auth/google');
 });
