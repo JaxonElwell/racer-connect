@@ -95,6 +95,25 @@ app.post('/api/StudentOrganizations', (req, res) => {
     }
 });
 
+// POST new event
+app.post('/api/Events', (req, res) => {
+    const { organization_id, name, event_date, location, description, image } = req.body;
+    if (!organization_id || !name || !event_date || !location) {
+        res.status(400).send('organization_id, name, event_date, and location cannot be null');
+    } else {
+        const sql = 'INSERT INTO StudentOrganizations(organization_id, name, event_date, location, description, image) VALUES (?, ?, ?, ?, ?, ?)';
+        db.run(sql, [organization_id, name, event_date, location, description, image], function (err) {
+            if (err) {
+                console.error(err.message);
+                res.status(500).send('Internal server error');
+            } else {
+                const id = this.lastID;
+                res.status(201).send({ id, organization_id, name, event_date, location, description, image });
+            }
+        });
+    }
+});
+
 // PUT update organization by id
 app.put('/api/StudentOrganizations/:id', (req, res) => {
     const { id } = req.params;
