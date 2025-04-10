@@ -1,3 +1,6 @@
+// IMPORTANT
+// CURRENT SETTING THE ORGANIZATION ID TO 1 IF "ME" IS SELECTED
+
 import React, { useState } from 'react';
 
 function FormStep1({ onNext }) {
@@ -5,11 +8,15 @@ function FormStep1({ onNext }) {
   const [organization, setOrganization] = useState('');
 
   const handleNext = () => {
+    // Automatically set organization ID to 1 if "Me" is selected
+    const selectedOrganization = host === 'Me' ? '1' : organization;
+
     if (host === 'My Organization' && !organization) {
       alert('Please select an organization.');
       return;
     }
-    onNext({ host, organization });
+
+    onNext({ host, organization: selectedOrganization });
   };
 
   return (
@@ -32,8 +39,8 @@ function FormStep1({ onNext }) {
         >
           <option value="">Select your organization</option>
           {/* Replace the options below with dynamic data from the database */}
-          <option value="Org1">Organization 1</option>
-          <option value="Org2">Organization 2</option>
+          <option value="1">Organization 1</option>
+          <option value="2">Organization 2</option>
         </select>
       )}
       <button onClick={handleNext} className="bg-blue-500 text-white px-4 py-2 rounded">

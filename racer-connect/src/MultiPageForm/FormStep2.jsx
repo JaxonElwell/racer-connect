@@ -5,13 +5,14 @@ function FormStep2({ onNext, onBack }) {
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [description, setDescription] = useState('');
+  const [location, setLocation] = useState('');
 
   const handleNext = () => {
-    if (!eventName || !startDate || !startTime || !description) {
+    if (!eventName || !startDate || !startTime || !description || !location) {
       alert('Please fill out all fields.');
       return;
     }
-    onNext({ eventName, startDate, startTime, description });
+    onNext({ eventName, startDate, startTime, description, location });
   };
 
   return (
@@ -42,6 +43,13 @@ function FormStep2({ onNext, onBack }) {
         onChange={(e) => setDescription(e.target.value)}
         className="border p-2 rounded w-full mb-4 text-black"
       ></textarea>
+      <input
+        type="text"
+        placeholder="Event Location"
+        value={location}
+        onChange={(e) => setLocation(e.target.value)}
+        className="border p-2 rounded w-full mb-4 text-black"
+      />
       <div className="flex justify-between">
         <button onClick={onBack} className="bg-gray-500 text-white px-4 py-2 rounded">
           Back
