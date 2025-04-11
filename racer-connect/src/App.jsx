@@ -93,12 +93,12 @@ function App() {
       </div>
 
       {/* Featured Events Section */}
-      <div className="mt-8 px-4 sm:px-8">
-        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-7xl mx-auto">
+      <div className="mt-8 px-4 sm:px-8 flex justify-center w-full">
+        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-7xl">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Featured Events</h2>
           <div className="grid grid-cols-2 gap-4">
-            {isLoadingEvents
-              ? [1, 2].map((key) => <SkeletonEventCard key={key} />) // Show skeletons while loading
+            {isLoadingEvents || events.length === 0
+              ? [1, 2].map((key) => <SkeletonEventCard key={key} />) // Show skeletons while loading or if no events
               : events.slice(0, 2).map((event) => ( // Show events if available
                   <div
                     key={event.id}
@@ -117,9 +117,6 @@ function App() {
                     </div>
                   </div>
                 ))}
-            {!isLoadingEvents && events.length === 0 && (
-              <p className="text-gray-700 col-span-2 text-center">No featured events available.</p>
-            )}
           </div>
         </div>
       </div>
