@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import Layout from './Layout';
 import OrgModal from './OrgModal';
 import Form from './MultiPageForm/Form';
+import SkeletonEventCard from './Components/SkeletonEventCard'; // Import the SkeletonEventCard component
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedOrganization, setSelectedOrganization] = useState(null);
   const [organizations, setOrganizations] = useState([]);
+  const [events, setEvents] = useState([]); // Ensure initial state is an array
   const [error, setError] = useState(null);
+  const [isLoadingEvents, setIsLoadingEvents] = useState(true); // Loading state for events
 
   useEffect(() => {
     // Fetch all organizations when the component mounts
@@ -16,6 +19,20 @@ function App() {
       .then((response) => response.json())
       .then((data) => setOrganizations(data.data))
       .catch((error) => console.error('Error fetching organizations:', error));
+
+    // Fetch all events
+    fetch('/api/Events')
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setEvents(data); // Ensure `data` is an array
+        } else {
+          console.error('Expected an array but got:', data);
+          setEvents([]); // Fallback to an empty array
+        }
+      })
+      .catch((error) => console.error('Error fetching events:', error))
+      .finally(() => setIsLoadingEvents(false)); // Set loading to false
   }, []);
 
   const handleOpenModal = (id) => {
@@ -71,6 +88,38 @@ function App() {
             <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3">
               Find organizations
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Featured Events Section */}
+      <div className="mt-8 px-4 sm:px-8">
+        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-7xl mx-auto">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Featured Events</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {isLoadingEvents
+              ? [1, 2].map((key) => <SkeletonEventCard key={key} />) // Show skeletons while loading
+              : events.slice(0, 2).map((event) => ( // Show events if available
+                  <div
+                    key={event.id}
+                    className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105"
+                  >
+                    <img
+                      src={event.image || 'defaultEvent.jpg'}
+                      alt={event.name}
+                      className="rounded-lg w-20 h-20 mr-4"
+                    />
+                    <div>
+                      <h3 className="font-bold text-lg text-gray-900">{event.name}</h3>
+                      <p className="text-sm text-gray-700">{event.description}</p>
+                      <p className="text-sm text-gray-700"><strong>📅 {event.event_date}</strong></p>
+                      <p className="text-sm text-gray-700"><strong>📍 {event.location}</strong></p>
+                    </div>
+                  </div>
+                ))}
+            {!isLoadingEvents && events.length === 0 && (
+              <p className="text-gray-700 col-span-2 text-center">No featured events available.</p>
+            )}
           </div>
         </div>
       </div>
