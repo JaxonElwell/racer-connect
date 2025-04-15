@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from './Layout';
 import OrgModal from './OrgModal';
 import Form from './MultiPageForm/Form';
-import SkeletonEventCard from './Components/SkeletonEventCard'; // Import the SkeletonEventCard component
+import SkeletonEventCard from './Components/SkeletonEventCard';
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
