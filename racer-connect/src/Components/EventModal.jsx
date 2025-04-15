@@ -15,7 +15,7 @@ function EventModal({ isOpen, onClose, event }) {
       <div className="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-md z-10">
         <div className="flex items-center mb-4">
           <img
-            src={event.image || 'defaultEvent.jpg'}
+            src={event.image || 'defaultEvent.jpg'} // Use the image URL or fallback to default
             alt={event.name}
             className="rounded-lg w-20 h-20 mr-4"
           />
