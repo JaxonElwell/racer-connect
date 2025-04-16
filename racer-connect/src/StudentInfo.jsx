@@ -1,46 +1,78 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Layout from './Layout';
 
+const StudentInfo = () => {
+  const location = useLocation();
+  const [user, setUser] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [organization, setOrganization] = useState("");
 
+  useEffect(() => {
+    // Fetch real authenticated user data from backend
+    axios.get('http://localhost:5000/auth/profile', { withCredentials: true })
+      .then(res => {
+        console.log('User from backend:', res.data.user); 
+        const googleUser = res.data.user;
+        setUser({
+            name: googleUser.displayName || `${googleUser.name?.givenName || ''} ${googleUser.name?.familyName || ''}`,
+            email: googleUser.emails?.[0]?.value,
+            picture: googleUser.photos?.[0]?.value
+          });
+      })
+      .catch(err => {
+        console.error('Error fetching user profile:', err);
+      });
 
-const StudentInfo = ({ user }) => {
-  if (!user) {
-    return <div className="text-center mt-10 text-lg">Loading your account info...</div>;
-  }
+    // Mocked event/org data until backend integration
+    setEvents([
+      { id: 1, name: "Tech Talk - AI in 2025", date: "2025-04-20" },
+      { id: 2, name: "Hackathon", date: "2025-05-01" }
+    ]);
+    setOrganization("Computer Science Club");
+  }, []);
 
-  const navigate = useNavigate();
-  // Extract calendar ID from email for now (personal calendar)
-  const calendarSrc = `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(user.email)}&ctz=America/Chicago`;
+  if (!user) return <div className="text-center mt-10">Loading user info...</div>;
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-6 rounded-xl shadow-lg bg-white">
-      <h1 className="text-2xl font-bold mb-4 text-center">Welcome, {user.name}!</h1>
+    <Layout>
+      <div className="w-full bg-gradient-to-br from-blue-100 to-purple-200 p-4 flex justify-center items-start">
+        <div className="w-full max-w-4xl mt-10 p-6 bg-white shadow-lg rounded-xl">
+          <div className="flex items-center gap-4 mb-6">
+            <img
+              src={user.picture}
+              alt="Profile"
+              className="w-20 h-20 rounded-full border"
+            />
+            <div>
+              <h2 className="text-2xl font-semibold">{user.name}</h2>
+              <p className="text-gray-600 mb-2 break-all">{user.email}</p>
+            </div>
+          </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-8">
-        <div className="text-center sm:text-left">
-          <p className="text-lg font-medium">Email: <span className="text-gray-700">{user.email}</span></p>
+          <div className="mb-6">
+            <h3 className="text-xl font-bold mb-2">Organization</h3>
+            <p>{organization}</p>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-bold mb-2">Signed Up Events</h3>
+            {events.length > 0 ? (
+              <ul className="list-disc pl-6 space-y-1">
+                {events.map((event) => (
+                  <li key={event.id}>
+                    {event.name} – <span className="text-gray-500">{event.date}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No events signed up yet.</p>
+            )}
+          </div>
         </div>
-        {user.picture && (
-          <img
-            src={user.picture}
-            alt="Profile"
-            className="w-20 h-20 rounded-full border-2 border-gray-300"
-          />
-        )}
       </div>
-
-      <h2 className="text-xl font-semibold mb-4 text-center">Your Google Calendar</h2>
-      <div className="aspect-video">
-        <iframe
-          title="Google Calendar"
-          src={calendarSrc}
-          style={{ border: 0, width: '100%', height: '100%' }}
-          frameBorder="0"
-          scrolling="no"
-        />
-      </div>
-    </div>
+    </Layout>
   );
 };
 
