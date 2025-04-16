@@ -20,6 +20,11 @@ const StudentInfo = () => {
             email: googleUser.emails?.[0]?.value,
             picture: googleUser.photos?.[0]?.value
           });
+          console.log("User state just set:", {
+            name: googleUser.displayName || `${googleUser.name?.givenName || ''} ${googleUser.name?.familyName || ''}`,
+            email: googleUser.emails?.[0]?.value,
+            picture: googleUser.photos?.[0]?.value
+          });
       })
       .catch(err => {
         console.error('Error fetching user profile:', err);
@@ -46,20 +51,20 @@ const StudentInfo = () => {
               className="w-20 h-20 rounded-full border"
             />
             <div>
-              <h2 className="text-2xl font-semibold">{user.name}</h2>
+                <h2 style={{ color: 'red', fontSize: '24px' }}>{user.name}</h2>
               <p className="text-gray-600 mb-2 break-all">{user.email}</p>
             </div>
           </div>
 
           <div className="mb-6">
-            <h3 className="text-xl font-bold mb-2">Organization</h3>
+            <h3 style={{ color: 'red', fontSize: '24px' }}>Organization</h3>
             <p>{organization}</p>
           </div>
 
           <div>
-            <h3 className="text-xl font-bold mb-2">Signed Up Events</h3>
+            <h3 style={{ color: 'red', fontSize: '24px' }}>Signed Up Events</h3>
             {events.length > 0 ? (
-              <ul className="list-disc pl-6 space-y-1">
+              <ul style={{ color: 'red', fontSize: '24px' }}>
                 {events.map((event) => (
                   <li key={event.id}>
                     {event.name} – <span className="text-gray-500">{event.date}</span>
