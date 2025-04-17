@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Layout from './Layout';
 import OrgModal from './OrgModal';
 import Form from './MultiPageForm/Form';
-import SkeletonEventCard from './Components/SkeletonEventCard'; // Import the SkeletonEventCard component
+import SkeletonEventCard from './Components/SkeletonEventCard';
+import EventModal from './Components/EventModal';
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedOrganization, setSelectedOrganization] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null); // State for the selected event
   const [organizations, setOrganizations] = useState([]);
   const [events, setEvents] = useState([]); // Ensure initial state is an array
   const [error, setError] = useState(null);
@@ -17,15 +19,22 @@ function App() {
     // Fetch all organizations when the component mounts
     fetch('/api/StudentOrganizations')
       .then((response) => response.json())
-      .then((data) => setOrganizations(data.data))
+      .then((data) => {
+        if (Array.isArray(data.data)) {
+          setOrganizations(data.data); // Access the `data` property
+        } else {
+          console.error('Expected an array but got:', data);
+          setOrganizations([]); // Fallback to an empty array
+        }
+      })
       .catch((error) => console.error('Error fetching organizations:', error));
-
+  
     // Fetch all events
     fetch('/api/Events')
       .then((response) => response.json())
       .then((data) => {
-        if (Array.isArray(data)) {
-          setEvents(data); // Ensure `data` is an array
+        if (Array.isArray(data.data)) {
+          setEvents(data.data); // Access the `data` property
         } else {
           console.error('Expected an array but got:', data);
           setEvents([]); // Fallback to an empty array
@@ -35,33 +44,14 @@ function App() {
       .finally(() => setIsLoadingEvents(false)); // Set loading to false
   }, []);
 
-  const handleOpenModal = (id) => {
-    // Fetch the organization details by ID
-    fetch(`/api/StudentOrganizations/${id}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Organization not found');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setSelectedOrganization(data);
-        setIsModalOpen(true);
-        setError(null); // Clear any previous errors
-      })
-      .catch((error) => {
-        console.error('Error fetching organization:', error);
-        setError(error.message);
-      });
+  const handleOpenEventModal = (event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseEventModal = () => {
+    setSelectedEvent(null);
     setIsModalOpen(false);
-    setSelectedOrganization(null);
-  };
-
-  const handleCloseError = () => {
-    setError(null);
   };
 
   const handleCloseForm = () => {
@@ -102,7 +92,8 @@ function App() {
               : events.slice(0, 2).map((event) => ( // Show events if available
                   <div
                     key={event.id}
-                    className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105"
+                    className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105 cursor-pointer"
+                    onClick={() => handleOpenEventModal(event)} // Open modal on click
                   >
                     <img
                       src={event.image || 'defaultEvent.jpg'}
@@ -120,22 +111,6 @@ function App() {
           </div>
         </div>
       </div>
-
-      {/* Multi-Page Form */}
-      {isFormOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          {/* Background Overlay */}
-          <div
-            className="absolute inset-0 bg-black opacity-60"
-            onClick={handleCloseForm} // Close the form when clicking outside
-          ></div>
-
-          {/* Form Container */}
-          <div className="relative bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl z-10">
-            <Form onClose={handleCloseForm} />
-          </div>
-        </div>
-      )}
 
       {/* My Events Section */}
       <div className="mt-8 px-4 sm:px-8 flex justify-center w-full">
@@ -174,6 +149,13 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* Event Modal */}
+      <EventModal
+        isOpen={isModalOpen}
+        onClose={handleCloseEventModal}
+        event={selectedEvent}
+      />
 
       {/* Organizations Section */}
       <div className="mt-8 px-4 sm:px-8">
@@ -227,28 +209,18 @@ function App() {
         </div>
       </div>
 
-      {/* Organization Modal */}
-      <OrgModal isOpen={isModalOpen} onClose={handleCloseModal} organization={selectedOrganization} />
-
       {/* Multi-Page Form */}
-      {isFormOpen && <Form onClose={handleCloseForm} />}
-
-      {/* Error Modal */}
-      {error && (
+      {isFormOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           {/* Background Overlay */}
-          <div className="absolute inset-0 bg-black opacity-60"></div>
+          <div
+            className="absolute inset-0 bg-black opacity-60"
+            onClick={handleCloseForm} // Close the form when clicking outside
+          ></div>
 
-          {/* Error Modal Content */}
-          <div className="bg-white rounded-lg p-8 shadow-lg w-full max-w-md text-center z-10 relative">
-            <h2 className="text-2xl font-bold mb-4 text-black">Error</h2>
-            <p className="mb-4 text-gray-800">{error}</p>
-            <button
-              className="bg-red-500 text-white font-bold py-2 px-4 rounded hover:bg-red-600 transition duration-300"
-              onClick={handleCloseError}
-            >
-              Close
-            </button>
+          {/* Form Container */}
+          <div className="relative bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl z-10">
+            <Form onClose={handleCloseForm} />
           </div>
         </div>
       )}
