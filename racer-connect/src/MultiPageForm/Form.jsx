@@ -33,18 +33,18 @@ function Form() {
     const eventDate = formData.startDate;
     const eventTime = formData.startTime;
     const eventDateTime = `${eventDate}T${eventTime}:00`;
-
+  
     const eventData = {
       organization_id: formData.organization || null,
       name: formData.eventName,
       event_date: eventDateTime,
       location: formData.location,
       description: formData.description,
-      image: formData.image,
+      image: formData.image, // Use the image URL
     };
-
+  
     console.log('Event Data:', eventData);
-
+  
     if (!eventData.organization_id || !eventData.name || !eventData.event_date || !eventData.location) {
       setModal({
         isOpen: true,
@@ -53,16 +53,16 @@ function Form() {
       });
       return;
     }
-
+  
     try {
       const response = await fetch('/api/Events', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(eventData),
+        body: JSON.stringify(eventData), // Send the image URL in the JSON
       });
-
+  
       if (response.ok) {
         const result = await response.json();
         console.log('Event created successfully:', result);
