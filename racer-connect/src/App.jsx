@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from './Layout';
 import OrgModal from './OrgModal';
 import Form from './MultiPageForm/Form';
+import { useNavigate } from 'react-router-dom';
 import SkeletonEventCard from './Components/SkeletonEventCard';
 import EventModal from './Components/EventModal';
 
@@ -14,7 +15,11 @@ function App() {
   const [events, setEvents] = useState([]); // Ensure initial state is an array
   const [error, setError] = useState(null);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true); // Loading state for events
-
+  const navigate = useNavigate();
+  const goToStudentInfo = () => {
+    navigate('/StudentInfo'); 
+  };
+  
   useEffect(() => {
     // Fetch all organizations when the component mounts
     fetch('/api/StudentOrganizations')
@@ -77,6 +82,12 @@ function App() {
             </button>
             <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3">
               Find organizations
+            </button>
+            {/*Temporary Button*/}
+            <button
+              className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3"
+              onClick={goToStudentInfo}>
+              Student Test
             </button>
           </div>
         </div>
