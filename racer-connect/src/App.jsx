@@ -16,8 +16,13 @@ function App() {
   const [error, setError] = useState(null);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true); // Loading state for events
   const navigate = useNavigate();
+  
   const goToStudentInfo = () => {
     navigate('/StudentInfo'); 
+  };
+  
+  const goToOrganizationsPage = () => {
+    navigate('/OrganizationsPage');
   };
   
   useEffect(() => {
@@ -80,7 +85,8 @@ function App() {
             <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3">
               Find events
             </button>
-            <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3">
+            <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3"
+              onClick={goToOrganizationsPage}>
               Find organizations
             </button>
             {/*Temporary Button*/}
