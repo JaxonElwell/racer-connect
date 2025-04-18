@@ -69,6 +69,22 @@ app.get('/api/StudentOrganizations', (req, res) => {
     });
 });
 
+// GET all organizations with pagination
+app.get('/api/StudentOrganizationsPaginated', (req, res) => {
+    const page = parseInt(req.query.page) || 0; // Default to page 0
+    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+    const offset = page * limit;
+
+    const sql = 'SELECT * FROM StudentOrganizations LIMIT ? OFFSET ?';
+    db.all(sql, [limit, offset], (err, rows) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.json({ data: rows });
+    });
+});
+
 // GET all users
 app.get('/api/Users', (req, res) => {
     db.all('SELECT * FROM Users', [], (err, rows) => {
