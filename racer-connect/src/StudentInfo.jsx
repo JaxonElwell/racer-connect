@@ -1,42 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import axios from 'axios';
-import Layout from './Layout';
+import React from 'react';
+import Layout from './Layout'; // adjust if needed
+import { useUser } from './context/UserContext'; // path depends on your final structure
 
 const StudentInfo = () => {
-  const location = useLocation();
-  const [user, setUser] = useState(null);
-  const [events, setEvents] = useState([]);
-  const [organization, setOrganization] = useState("");
+  const { user } = useUser();
 
-  useEffect(() => {
-    // Fetch real authenticated user data from backend
-    axios.get('http://localhost:5000/auth/profile', { withCredentials: true })
-      .then(res => {
-        console.log('User from backend:', res.data.user); 
-        const googleUser = res.data.user;
-        setUser({
-            name: googleUser.displayName || `${googleUser.name?.givenName || ''} ${googleUser.name?.familyName || ''}`,
-            email: googleUser.emails?.[0]?.value,
-            picture: googleUser.photos?.[0]?.value
-          });
-          console.log("User state just set:", {
-            name: googleUser.displayName || `${googleUser.name?.givenName || ''} ${googleUser.name?.familyName || ''}`,
-            email: googleUser.emails?.[0]?.value,
-            picture: googleUser.photos?.[0]?.value
-          });
-      })
-      .catch(err => {
-        console.error('Error fetching user profile:', err);
-      });
-
-    // Mocked event/org data until backend integration
-    setEvents([
-      { id: 1, name: "Tech Talk - AI in 2025", date: "2025-04-20" },
-      { id: 2, name: "Hackathon", date: "2025-05-01" }
-    ]);
-    setOrganization("Computer Science Club");
-  }, []);
+  // Placeholder/mock data (remove later if pulling from API)
+  const events = [
+    { id: 1, name: "Tech Talk - AI in 2025", date: "2025-04-20" },
+    { id: 2, name: "Hackathon", date: "2025-05-01" }
+  ];
+  const organization = "Computer Science Club";
 
   if (!user) return <div className="text-center mt-10">Loading user info...</div>;
 
@@ -51,7 +25,7 @@ const StudentInfo = () => {
               className="w-20 h-20 rounded-full border"
             />
             <div>
-                <h2 style={{ color: 'red', fontSize: '24px' }}>{user.name}</h2>
+              <h2 style={{ color: 'red', fontSize: '24px' }}>{user.name}</h2>
               <p className="text-gray-600 mb-2 break-all">{user.email}</p>
             </div>
           </div>
@@ -74,6 +48,18 @@ const StudentInfo = () => {
             ) : (
               <p>No events signed up yet.</p>
             )}
+          </div>
+
+          <h3 style={{ color: 'red', fontSize: '24px' }} className="mt-10">Your Google Calendar</h3>
+          <div className="aspect-video w-full mt-4">
+            <iframe
+                src={`https://calendar.google.com/calendar/embed?src=${encodeURIComponent(user.email)}&ctz=America/Chicago`}
+                style={{ border: 0 }}
+                className="w-full h-full rounded-lg shadow-lg"
+                frameBorder="0"
+                scrolling="no"
+                title="Google Calendar"
+            ></iframe>
           </div>
         </div>
       </div>
