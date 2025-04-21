@@ -16,15 +16,19 @@ function App() {
   const [error, setError] = useState(null);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true); // Loading state for events
   const navigate = useNavigate();
-  
+
   const goToStudentInfo = () => {
-    navigate('/StudentInfo'); 
+    navigate('/StudentInfo');
   };
-  
+
   const goToOrganizationsPage = () => {
     navigate('/OrganizationsPage');
   };
-  
+
+  const goToEventsPage = () => {
+    navigate('/EventsPage'); // Navigate to the EventsPage
+  };
+
   useEffect(() => {
     // Fetch all organizations when the component mounts
     fetch('/api/StudentOrganizations')
@@ -38,7 +42,7 @@ function App() {
         }
       })
       .catch((error) => console.error('Error fetching organizations:', error));
-  
+
     // Fetch all events
     fetch('/api/Events')
       .then((response) => response.json())
@@ -71,151 +75,32 @@ function App() {
   return (
     <Layout>
       <h1 className="text-3xl font-bold text-center">Welcome to Racer Connect</h1>
-      
+
       {/* Buttons Section */}
       <div className="mt-4 flex justify-center items-center w-full px-4 sm:px-8">
         <div className="bg-white rounded-lg p-8 shadow-lg w-full max-w-7xl">
           <div className="flex justify-between space-x-4 w-full">
             <button
               className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3"
-              onClick={() => setIsFormOpen(true)}
+              onClick={() => {
+                console.log('Opening form...');
+                setIsFormOpen(true);
+              }}
             >
               Organize an event
             </button>
-            <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3">
+            <button
+              className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3"
+              onClick={goToEventsPage} // Navigate to EventsPage
+            >
               Find events
             </button>
-            <button className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3"
-              onClick={goToOrganizationsPage}>
+            <button
+              className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3"
+              onClick={goToOrganizationsPage}
+            >
               Find organizations
             </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Featured Events Section */}
-      <div className="mt-8 px-4 sm:px-8 flex justify-center w-full">
-        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-7xl">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Featured Events</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {isLoadingEvents || events.length === 0
-              ? [1, 2].map((key) => <SkeletonEventCard key={key} />) // Show skeletons while loading or if no events
-              : events.slice(0, 2).map((event) => ( // Show events if available
-                  <div
-                    key={event.id}
-                    className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105 cursor-pointer"
-                    onClick={() => handleOpenEventModal(event)} // Open modal on click
-                  >
-                    <img
-                      src={event.image || 'defaultEvent.jpg'}
-                      alt={event.name}
-                      className="rounded-lg w-20 h-20 mr-4"
-                    />
-                    <div>
-                      <h3 className="font-bold text-lg text-gray-900">{event.name}</h3>
-                      <p className="text-sm text-gray-700">{event.description}</p>
-                      <p className="text-sm text-gray-700"><strong>📅 {event.event_date}</strong></p>
-                      <p className="text-sm text-gray-700"><strong>📍 {event.location}</strong></p>
-                    </div>
-                  </div>
-                ))}
-          </div>
-        </div>
-      </div>
-
-      {/* My Events Section */}
-      <div className="mt-8 px-4 sm:px-8 flex justify-center w-full">
-        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-7xl">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-900">My Events</h2>
-            <a href="#" className="text-gray-600 hover:underline">See All</a>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105">
-              <img 
-                src="bgClub.jpg" 
-                alt="Event Thumbnail" 
-                className="rounded-lg w-20 h-20 mr-4"
-              />
-              <div>
-                <h3 className="font-bold text-lg text-gray-900">Field Games and Giant Games</h3>
-                <p className="text-sm text-gray-700">Board Game Club</p>
-                <p className="text-sm text-gray-700"><strong>📅 September 18</strong></p>
-                <p className="text-sm text-gray-700"><strong>📍 Waterfield Breezeway</strong></p>
-              </div>
-            </div>
-            <div className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105">
-              <img 
-                src="CASzBci.jpeg" 
-                alt="Event Thumbnail" 
-                className="rounded-lg w-20 h-20 mr-4"
-              />
-              <div>
-                <h3 className="font-bold text-lg text-gray-900">Best in the West #4</h3>
-                <p className="text-sm text-gray-700">Murray State Tournaments & Local Events</p>
-                <p className="text-sm text-gray-700"><strong>📅 January 26</strong></p>
-                <p className="text-sm text-gray-700"><strong>📍 Clark South Commons</strong></p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Event Modal */}
-      <EventModal
-        isOpen={isModalOpen}
-        onClose={handleCloseEventModal}
-        event={selectedEvent}
-      />
-
-      {/* Organizations Section */}
-      <div className="mt-8 px-4 sm:px-8">
-        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-7xl mx-auto">
-          {/* Section Header */}
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Student Organizations</h2>
-            <a href="#" className="text-gray-600 hover:underline">See All</a>
-          </div>
-
-          {/* Organizations Container */}
-          <div className="flex flex-col gap-4">
-            {organizations.length > 0 ? (
-              organizations.slice(0, 7).map((org) => (
-                <div 
-                  key={org.id} 
-                  className="bg-gray-100 rounded-lg p-4 flex items-center cursor-pointer hover:bg-gray-200 transition hover:scale-105"
-                  onClick={() => handleOpenModal(org.id)}
-                >
-                  <img 
-                    src={org.image || "defaultOrg.jpg"} 
-                    alt={org.name} 
-                    className="rounded-lg w-20 h-20 mr-4"
-                  />
-                  <div>
-                    <h3 className="font-bold text-lg text-gray-900">{org.name}</h3>
-                    <p className="text-sm text-gray-700">{org.description}</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-700">No organizations found.</p>
-            )}
-
-            {/* Dummy Organization */}
-            <div 
-              className="bg-gray-100 rounded-lg p-4 flex items-center cursor-pointer hover:bg-gray-200 transition"
-              onClick={() => handleOpenModal(1)} // Hardcoded ID for testing
-            >
-              <img 
-                src="defaultOrg.jpg" 
-                alt="Dummy Organization" 
-                className="rounded-lg w-20 h-20 mr-4"
-              />
-              <div>
-                <h3 className="font-bold text-lg text-gray-900">Dummy Organization</h3>
-                <p className="text-sm text-gray-700">This is a dummy organization for testing purposes.</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -235,6 +120,127 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* Featured Events Section */}
+      <div className="mt-8 px-4 sm:px-8 flex justify-center w-full">
+        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-7xl">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Featured Events</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {isLoadingEvents ? (
+              // Show skeletons while loading
+              [1, 2].map((key) => <SkeletonEventCard key={key} />)
+            ) : (
+              (() => {
+                // Filter upcoming events
+                const filteredEvents = events.filter((event) => {
+                  const eventDate = new Date(event.event_date); // Parse the event date
+                  const today = new Date(); // Get today's date
+                  today.setHours(0, 0, 0, 0); // Reset time to midnight for accurate comparison
+                  return eventDate >= today; // Include only events today or in the future
+                });
+
+                // Check if there are any filtered events
+                if (filteredEvents.length === 0) {
+                  // Show skeletons if no upcoming events
+                  return [1, 2].map((key) => <SkeletonEventCard key={key} />);
+                }
+
+                // Render filtered events
+                return filteredEvents.slice(0, 2).map((event) => (
+                  <div
+                    key={event.id}
+                    className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105 cursor-pointer"
+                    onClick={() => handleOpenEventModal(event)} // Open modal on click
+                  >
+                    <img
+                      src={event.image || 'defaultEvent.jpg'}
+                      alt={event.name}
+                      className="rounded-lg w-20 h-20 mr-4"
+                    />
+                    <div>
+                      <h3 className="font-bold text-lg text-gray-900">{event.name}</h3>
+                      <p className="text-sm text-gray-700">{event.description}</p>
+                      <p className="text-sm text-gray-700">
+                        <strong>📅 {new Date(event.event_date).toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}</strong>
+                      </p>
+                      <p className="text-sm text-gray-700">
+                        <strong>⏰ {new Date(event.event_date).toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true,
+                        })}</strong>
+                      </p>
+                      <p className="text-sm text-gray-700">
+                        <strong>📍 {event.location}</strong>
+                      </p>
+                    </div>
+                  </div>
+                ));
+              })()
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* My Events Section */}
+      <div className="mt-8 px-4 sm:px-8 flex justify-center w-full">
+        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-7xl">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-gray-900">My Events</h2>
+            <a href="#" className="text-gray-600 hover:underline">
+              See All
+            </a>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105">
+              <img
+                src="bgClub.jpg"
+                alt="Event Thumbnail"
+                className="rounded-lg w-20 h-20 mr-4"
+              />
+              <div>
+                <h3 className="font-bold text-lg text-gray-900">Field Games and Giant Games</h3>
+                <p className="text-sm text-gray-700">Board Game Club</p>
+                <p className="text-sm text-gray-700">
+                  <strong>📅 September 18</strong>
+                </p>
+                <p className="text-sm text-gray-700">
+                  <strong>📍 Waterfield Breezeway</strong>
+                </p>
+              </div>
+            </div>
+            <div className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105">
+              <img
+                src="CASzBci.jpeg"
+                alt="Event Thumbnail"
+                className="rounded-lg w-20 h-20 mr-4"
+              />
+              <div>
+                <h3 className="font-bold text-lg text-gray-900">Best in the West #4</h3>
+                <p className="text-sm text-gray-700">Murray State Tournaments & Local Events</p>
+                <p className="text-sm text-gray-700">
+                  <strong>📅 January 26</strong>
+                </p>
+                <p className="text-sm text-gray-700">
+                  <strong>📍 Clark South Commons</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Event Modal */}
+      <EventModal
+        isOpen={isModalOpen}
+        onClose={handleCloseEventModal}
+        event={selectedEvent}
+      />
     </Layout>
   );
 }
