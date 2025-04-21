@@ -223,6 +223,121 @@ app.delete('/api/Events/:id', (req, res) => {
     });
 });
 
+// GET all events a user is registered for
+app.get('/api/UserEvents/:userId', (req, res) => {
+    const { userId } = req.params;
+    const sql = `
+        SELECT e.*
+        FROM Events e
+        JOIN UserEvents ue ON e.id = ue.event_id
+        WHERE ue.user_id = ?
+    `;
+    db.all(sql, [userId], (err, rows) => {
+        if (err) {
+            console.error('Error fetching user events:', err.message);
+            res.status(500).send('Failed to fetch user events');
+        } else {
+            res.status(200).json({ events: rows });
+        }
+    });
+});
+
+// POST - Register a user for an event
+app.post('/api/UserEvents', (req, res) => {
+    const { user_id, event_id } = req.body;
+    if (!user_id || !event_id) {
+        return res.status(400).send('user_id and event_id are required');
+    }
+
+    const sql = `INSERT INTO UserEvents (user_id, event_id) VALUES (?, ?)`;
+    db.run(sql, [user_id, event_id], function (err) {
+        if (err) {
+            console.error('Error registering for event:', err.message);
+            res.status(500).send('Failed to register for event');
+        } else {
+            res.status(201).json({ message: 'User registered for event' });
+        }
+    });
+});
+
+// DELETE - Unregister a user from an event
+app.delete('/api/UserEvents', (req, res) => {
+    const { user_id, event_id } = req.body;
+    if (!user_id || !event_id) {
+        return res.status(400).send('user_id and event_id are required');
+    }
+
+    const sql = `DELETE FROM UserEvents WHERE user_id = ? AND event_id = ?`;
+    db.run(sql, [user_id, event_id], function (err) {
+        if (err) {
+            console.error('Error unregistering from event:', err.message);
+            res.status(500).send('Failed to unregister from event');
+        } else if (this.changes === 0) {
+            res.status(404).send('User was not registered for this event');
+        } else {
+            res.status(200).json({ message: 'User unregistered from event' });
+        }
+    });
+});
+
+// GET all organizations a user is part of
+app.get('/api/UserOrganizations/:userId', (req, res) => {
+    const { userId } = req.params;
+    const sql = `
+        SELECT o.*
+        FROM StudentOrganizations o
+        JOIN UserOrganizations uo ON o.id = uo.organization_id
+        WHERE uo.user_id = ?
+    `;
+    db.all(sql, [userId], (err, rows) => {
+        if (err) {
+            console.error('Error fetching user organizations:', err.message);
+            res.status(500).send('Failed to fetch user organizations');
+        } else {
+            res.status(200).json({ organizations: rows });
+        }
+    });
+});
+
+// POST - Join an organization
+app.post('/api/UserOrganizations', (req, res) => {
+    const { user_id, organization_id } = req.body;
+    if (!user_id || !organization_id) {
+        return res.status(400).send('user_id and organization_id are required');
+    }
+
+    const sql = `INSERT INTO UserOrganizations (user_id, organization_id) VALUES (?, ?)`;
+    db.run(sql, [user_id, organization_id], function (err) {
+        if (err) {
+            console.error('Error joining organization:', err.message);
+            res.status(500).send('Failed to join organization');
+        } else {
+            res.status(201).json({ message: 'User joined organization' });
+        }
+    });
+});
+
+// DELETE - Leave an organization
+app.delete('/api/UserOrganizations', (req, res) => {
+    const { user_id, organization_id } = req.body;
+    if (!user_id || !organization_id) {
+        return res.status(400).send('user_id and organization_id are required');
+    }
+
+    const sql = `DELETE FROM UserOrganizations WHERE user_id = ? AND organization_id = ?`;
+    db.run(sql, [user_id, organization_id], function (err) {
+        if (err) {
+            console.error('Error leaving organization:', err.message);
+            res.status(500).send('Failed to leave organization');
+        } else if (this.changes === 0) {
+            res.status(404).send('User was not part of this organization');
+        } else {
+            res.status(200).json({ message: 'User left organization' });
+        }
+    });
+});
+
+
 // start the server
 const PORT = 5000;
 app.listen(PORT, () => {

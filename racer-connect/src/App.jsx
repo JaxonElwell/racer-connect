@@ -89,12 +89,6 @@ function App() {
               onClick={goToOrganizationsPage}>
               Find organizations
             </button>
-            {/*Temporary Button*/}
-            <button
-              className="bg-yellow-500 text-black font-bold py-2 px-6 rounded hover:bg-yellow-600 transition duration-300 w-1/3"
-              onClick={goToStudentInfo}>
-              Student Test
-            </button>
           </div>
         </div>
       </div>

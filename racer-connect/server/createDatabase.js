@@ -74,6 +74,41 @@ db.serialize(() => {
             }
         }
     );
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS UserOrganizations (
+            user_id INTEGER NOT NULL,
+            organization_id INTEGER NOT NULL,
+            PRIMARY KEY (user_id, organization_id),
+            FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
+            FOREIGN KEY (organization_id) REFERENCES StudentOrganizations(id) ON DELETE CASCADE
+        );`,
+        (err) => {
+            if (err) {
+                console.error('Error creating UserOrganizations table:', err.message);
+            } else {
+                console.log('UserOrganizations table created successfully');
+            }
+        }
+    );
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS UserEvents (
+          user_id INTEGER NOT NULL,
+          event_id INTEGER NOT NULL,
+          PRIMARY KEY (user_id, event_id),
+          FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
+          FOREIGN KEY (event_id) REFERENCES Events(id) ON DELETE CASCADE
+        );`,
+        (err) => {
+          if (err) {
+            console.error('Error creating UserEvents table:', err.message);
+          } else {
+            console.log('UserEvents table created successfully');
+          }
+        }
+      );
+      
 })
 
 db.close();
