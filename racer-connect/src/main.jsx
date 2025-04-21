@@ -7,6 +7,7 @@ import App from './App.jsx';
 import Banner from './banner.jsx';
 import StudentInfo from './StudentInfo.jsx';
 import OrganizationsPage from './OrganizationsPage.jsx';
+import EventsPage from './EventsPage.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/" element={<App />} />
             <Route path="/StudentInfo" element={<StudentInfo />} />
             <Route path="/OrganizationsPage" element={<OrganizationsPage />} />
+            <Route path="/EventsPage" element={<EventsPage />} />
             <Route path="*" element={<div>Page Not Found</div>} />
           </Routes>
         </div>
