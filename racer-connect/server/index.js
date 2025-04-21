@@ -58,6 +58,22 @@ app.get('/api/Events', (req, res) => {
     });
 });
 
+// GET all events with pagination
+app.get('/api/EventsPaginated', (req, res) => {
+    const page = parseInt(req.query.page) || 0; // Default to page 0
+    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+    const offset = page * limit;
+
+    const sql = 'SELECT * FROM Events LIMIT ? OFFSET ?';
+    db.all(sql, [limit, offset], (err, rows) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.json({ data: rows });
+    });
+});
+
 // GET all organizations
 app.get('/api/StudentOrganizations', (req, res) => {
     db.all('SELECT * FROM StudentOrganizations', [], (err, rows) => {

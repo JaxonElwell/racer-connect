@@ -6,7 +6,7 @@ import OrgModal from './OrgModal';
 
 function OrganizationsPage() {
   const [organizations, setOrganizations] = useState([]); // Loaded organizations
-  const [currentPage, setCurrentPage] = useState(0); // Tracks the current page (batch of rows)
+  const [currentPage, setCurrentPage] = useState(0); // Tracks the current page
   const [isLoading, setIsLoading] = useState(false); // Loading state for fetching data
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
   const [selectedOrganization, setSelectedOrganization] = useState(null); // Selected organization for the modal
