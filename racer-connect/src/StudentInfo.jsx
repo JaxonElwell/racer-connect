@@ -49,7 +49,7 @@ const StudentInfo = () => {
             <img
               src={user.picture}
               alt="Profile"
-              className="w-20 h-20 rounded-full border border-gray-300"
+              className="w-20 h-20 rounded-full border border-gray-300 object-cover"
             />
             <div>
               <h2 className="text-2xl font-semibold text-gray-900">{user.name}</h2>
