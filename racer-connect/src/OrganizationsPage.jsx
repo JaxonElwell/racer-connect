@@ -54,8 +54,7 @@ function OrganizationsPage() {
     setIsModalOpen(false);
   };
 
-  const handleSearch = (e) => {
-    setCurrentSearch(e.target.value);
+  const handleSearch = () => {
     setOrganizations([]);
     setCurrentPage(0);
     fetchOrganizations(currentPage, currentSearch);
@@ -79,10 +78,17 @@ function OrganizationsPage() {
           <input
             type="text"
             value={currentSearch}
-            onChange={handleSearch}
+            onChange={(e) => {setCurrentSearch(e.target.value)}}
             placeholder="Search organizations..."
             className="border bg-white border-gray-300 rounded-lg p-2 w-full max-w-md text-black"
           />
+          <button
+            onClick={handleSearch}
+            className="bg-blue-500 text-white font-bold py-2 px-6 rounded hover:bg-blue-600 transition duration-300"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Loading...' : 'Search'}
+          </button>
         </div>
 
         <div className="grid grid-cols-5 gap-4">
