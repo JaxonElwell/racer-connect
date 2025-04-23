@@ -5,6 +5,7 @@ import EventModal from './Components/EventModal';
 function EventsPage() {
   const [events, setEvents] = useState([]); // Loaded events
   const [currentPage, setCurrentPage] = useState(0); // Tracks the current page
+  const [currentSearch, setCurrentSearch] = useState(''); // Tracks the current search
   const [isLoading, setIsLoading] = useState(false); // Loading state for fetching data
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
   const [selectedEvent, setSelectedEvent] = useState(null); // Selected event for the modal
@@ -12,11 +13,16 @@ function EventsPage() {
 
   const hasFetched = useRef(false); // Prevent double-fetch in Strict Mode
 
-  const fetchEvents = async (page) => {
+  const fetchEvents = async (page, search) => {
     setIsLoading(true);
     try {
       console.log(`Fetching page: ${page}`); // Debugging
-      const response = await fetch(`http://localhost:5000/api/EventsPaginated?page=${page}&limit=10`);
+      if(!search) { // Set Search
+        search = '%';
+      } else {
+        search = '%' + search + '%';
+      }
+      const response = await fetch(`http://localhost:5000/api/EventsPaginated?page=${page}&limit=10&search=${search}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -50,6 +56,12 @@ function EventsPage() {
     setIsModalOpen(false);
   };
 
+  const handleSearch = () => {
+    setEvents([]);
+    setCurrentPage(0);
+    fetchEvents(currentPage, currentSearch);
+  }
+
   useEffect(() => {
     if (!hasFetched.current) {
       console.log('Fetching initial events');
@@ -75,9 +87,18 @@ function EventsPage() {
         <div className="mb-6 flex justify-center">
           <input
             type="text"
+            value={currentSearch}
+            onChange={(e) => {setCurrentSearch(e.target.value)}}
             placeholder="Search events..."
             className="border bg-white border-gray-300 rounded-lg p-2 w-full max-w-md text-black"
           />
+          <button
+            onClick={handleSearch}
+            className="bg-blue-500 text-white font-bold py-2 px-6 rounded hover:bg-blue-600 transition duration-300"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Loading...' : 'Search'}
+          </button>
         </div>
 
         {/* Toggle for Past Events */}
