@@ -11,11 +11,12 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     axios.get('http://localhost:5000/auth/profile', { withCredentials: true })
       .then(res => {
-        const googleUser = res.data.user;
+        const dbUser = res.data.user;
         const parsedUser = {
-          name: googleUser.displayName || `${googleUser.name?.givenName || ''} ${googleUser.name?.familyName || ''}`,
-          email: googleUser.emails?.[0]?.value,
-          picture: googleUser.photos?.[0]?.value
+          id: dbUser.id,
+          name: `${dbUser.first_name} ${dbUser.last_name}`,
+          email: dbUser.email,
+          picture: dbUser.picture
         };
         setUser(parsedUser);
       })
@@ -23,6 +24,23 @@ export const UserProvider = ({ children }) => {
         console.error('Error fetching user profile in context:', err);
       });
   }, []);
+  useEffect(() => {
+    axios.get('http://localhost:5000/auth/profile', { withCredentials: true })
+      .then(res => {
+        const dbUser = res.data.user;
+        const parsedUser = {
+          id: dbUser.id,
+          name: `${dbUser.first_name} ${dbUser.last_name}`,
+          email: dbUser.email,
+          picture: dbUser.picture
+        };
+        setUser(parsedUser);
+      })
+      .catch(err => {
+        console.error('Error fetching user profile in context:', err);
+      });
+  }, []);
+    
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

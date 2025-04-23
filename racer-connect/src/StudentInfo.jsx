@@ -1,23 +1,37 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from './Layout';
 import { useUser } from './context/UserContext';
+import axios from 'axios';
 
 const StudentInfo = () => {
   const { user } = useUser();
   const navigate = useNavigate();
-
-  const events = [
+  const [organizations, setOrganizations] = useState([]);
+  const [events] = useState([
     { id: 1, name: 'Tech Talk - AI in 2025', date: '2025-04-20' },
     { id: 2, name: 'Hackathon', date: '2025-05-01' },
-  ];
-  const organization = 'Computer Science Club';
+  ]);
+
+  // Fetch user's joined orgs
+  useEffect(() => {
+    if (user?.id) {
+      axios
+        .get(`/api/UserOrganizations/${user.id}`)
+        .then((res) => {
+          setOrganizations(res.data.organizations || []);
+        })
+        .catch((err) => {
+          console.error('Error fetching user organizations:', err);
+        });
+    }
+  }, [user]);
 
   if (!user) return <div className="text-center mt-10">Loading user info...</div>;
 
   return (
     <Layout>
-      {/* 🔙 Back Button (top-left corner) */}
+      {/* 🔙 Back Button */}
       <div className="absolute top-4 left-4 z-20">
         <button
           onClick={() => navigate('/')}
@@ -27,7 +41,7 @@ const StudentInfo = () => {
         </button>
       </div>
 
-      {/* Main content */}
+      {/* Main Content */}
       <div className="w-full flex justify-center px-4">
         <div className="w-full max-w-4xl mt-10 p-6 bg-white shadow-lg rounded-xl text-black space-y-8">
           {/* Profile Header */}
@@ -35,7 +49,7 @@ const StudentInfo = () => {
             <img
               src={user.picture}
               alt="Profile"
-              className="w-20 h-20 rounded-full border border-gray-300"
+              className="w-20 h-20 rounded-full border border-gray-300 object-cover"
             />
             <div>
               <h2 className="text-2xl font-semibold text-gray-900">{user.name}</h2>
@@ -43,45 +57,51 @@ const StudentInfo = () => {
             </div>
           </div>
 
-          {/* Organization */}
+          {/* Organizations */}
           <section>
-            <h3 className="text-xl font-semibold text-blue-800 mb-2">Organization</h3>
-            <p className="text-gray-800">{organization}</p>
+            <h3 className="text-xl font-semibold text-blue-800 mb-2">Organizations</h3>
+            {organizations.length > 0 ? (
+              <ul className="list-disc list-inside text-gray-800 space-y-1">
+                {organizations.map((org) => (
+                  <li key={org.id}>{org.name}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-600 italic">You haven't joined any organizations yet.</p>
+            )}
             <button
-                onClick={() => navigate('/OrganizationsPage')}
-                className="text-sm text-blue-600 hover:underline mt-1"
+              onClick={() => navigate('/OrganizationsPage')}
+              className="text-sm text-blue-600 hover:underline mt-1"
             >
-                View all student organizations
+              View all student organizations
             </button>
-            </section>
-
+          </section>
 
           {/* Events */}
           <section>
             <h3 className="text-xl font-semibold text-blue-800 mb-2">Signed Up Events</h3>
             {events.length > 0 ? (
-                <ul className="list-disc list-inside text-gray-800 space-y-1">
+              <ul className="list-disc list-inside text-gray-800 space-y-1">
                 {events.map((event) => (
-                    <li key={event.id}>
-                    <span className="font-medium">{event.name}</span> — 
+                  <li key={event.id}>
+                    <span className="font-medium">{event.name}</span> —{' '}
                     <span className="text-sm text-gray-500 ml-1">{event.date}</span>
-                    </li>
+                  </li>
                 ))}
-                </ul>
+              </ul>
             ) : (
-                <p className="text-gray-600 italic">No events signed up yet.</p>
+              <p className="text-gray-600 italic">No events signed up yet.</p>
             )}
-
-            {/* Stub link for future page */}
             <button
-                onClick={() => {}}
-                disabled
-                className="text-sm text-blue-400 hover:underline mt-2 cursor-not-allowed"
-                title="Coming soon"
+              onClick={() => {}}
+              disabled
+              className="text-sm text-blue-400 hover:underline mt-2 cursor-not-allowed"
+              title="Coming soon"
             >
-                View all upcoming events
+              View all upcoming events
             </button>
-            </section>
+          </section>
+
           {/* Google Calendar */}
           <section>
             <h3 className="text-xl font-semibold text-blue-800 mb-2">Your Google Calendar</h3>
