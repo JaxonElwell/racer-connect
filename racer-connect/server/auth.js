@@ -26,22 +26,39 @@ passport.use(new GoogleStrategy({
 
     db.get('SELECT * FROM Users WHERE email = ?', [email], (err, row) => {
         if (err) return done(err);
-
+    
         if (row) {
-            return done(null, row); // User exists
-        } else {
-            const sql = `INSERT INTO Users (first_name, last_name, email, picture) VALUES (?, ?, ?, ?)`;
-                db.run(sql, [firstName, lastName, email, picture], function (err) {
+          // 🛠️ Optional: update picture if it's missing in DB
+          if (!row.picture && picture) {
+            db.run('UPDATE Users SET picture = ? WHERE id = ?', [picture, row.id], (updateErr) => {
+              if (updateErr) {
+                console.error('Failed to update missing profile picture:', updateErr.message);
+                return done(null, row); // fallback to stale user
+              }
+    
+              // ✅ RE-FETCH updated user to ensure session is fresh
+              db.get('SELECT * FROM Users WHERE id = ?', [row.id], (err, updatedUser) => {
                 if (err) return done(err);
-
-                db.get('SELECT * FROM Users WHERE id = ?', [this.lastID], (err, newUser) => {
-                    if (err) return done(err);
-                    return done(null, newUser);
-                });
+                return done(null, updatedUser); // refreshed session data
+              });
             });
+          } else {
+            return done(null, row); // already has picture
+          }
+        } else {
+          // INSERT new user
+          const sql = `INSERT INTO Users (first_name, last_name, email, picture) VALUES (?, ?, ?, ?)`;
+          db.run(sql, [firstName, lastName, email, picture], function (err) {
+            if (err) return done(err);
+    
+            db.get('SELECT * FROM Users WHERE id = ?', [this.lastID], (err, newUser) => {
+              if (err) return done(err);
+              return done(null, newUser);
+            });
+          });
         }
-    });
-}));
+      });
+    }));
 
 // Session handling
 passport.serializeUser((user, done) => {
