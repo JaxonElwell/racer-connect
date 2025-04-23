@@ -90,7 +90,7 @@ app.get('/api/StudentOrganizations', (req, res) => {
 app.get('/api/StudentOrganizationsPaginated', (req, res) => {
     const page = parseInt(req.query.page) || 0; // Default to page 0
     const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
-    const search = req.query.search || '%';
+    const search = req.query.search;
     const offset = page * limit;
 
     const sql = 'SELECT * FROM StudentOrganizations WHERE name LIKE ? LIMIT ? OFFSET ?';

@@ -7,17 +7,23 @@ import OrgModal from './OrgModal';
 function OrganizationsPage() {
   const [organizations, setOrganizations] = useState([]); // Loaded organizations
   const [currentPage, setCurrentPage] = useState(0); // Tracks the current page
+  const [currentSearch, setCurrentSearch] = useState(''); // Tracks the current page
   const [isLoading, setIsLoading] = useState(false); // Loading state for fetching data
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
   const [selectedOrganization, setSelectedOrganization] = useState(null); // Selected organization for the modal
 
   const hasFetched = useRef(false); // Prevent double-fetch in Strict Mode
 
-  const fetchOrganizations = async (page) => {
+  const fetchOrganizations = async (page, search) => {
     setIsLoading(true);
     try {
       console.log(`Fetching page: ${page}`); // Debugging
-      const response = await fetch(`/api/StudentOrganizationsPaginated?page=${page}&limit=10`); // Fetch 10 organizations (2 rows)
+      if(!search) { // Set Search
+        search = '%';
+      } else {
+        search = '%' + search + '%';
+      }
+      const response = await fetch(`/api/StudentOrganizationsPaginated?page=${page}&limit=10&search=${search}`); // Fetch 10 organizations (2 rows)
       const data = await response.json();
       console.log('Fetched data:', data.data); // Debugging
       if (Array.isArray(data.data)) {
@@ -35,7 +41,7 @@ function OrganizationsPage() {
   const handleLoadMore = () => {
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
-    fetchOrganizations(nextPage);
+    fetchOrganizations(nextPage, currentSearch);
   };
 
   const handleOpenModal = (organization) => {
@@ -47,6 +53,10 @@ function OrganizationsPage() {
     setSelectedOrganization(null);
     setIsModalOpen(false);
   };
+
+  const handleSearch = (e) => {
+    setCurrentSearch(e.target.value);
+  }
 
   useEffect(() => {
     if (!hasFetched.current) {
@@ -65,6 +75,8 @@ function OrganizationsPage() {
         <div className="mb-6 flex justify-center">
           <input
             type="text"
+            value={currentSearch}
+            onChange={handleSearch}
             placeholder="Search organizations..."
             className="border bg-white border-gray-300 rounded-lg p-2 w-full max-w-md text-black"
           />
