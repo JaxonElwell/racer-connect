@@ -60,7 +60,7 @@ function OrganizationsPage() {
     setCurrentPage(0);
     fetchOrganizations(currentPage, currentSearch);
   }
-
+//test
   useEffect(() => {
     if (!hasFetched.current) {
       console.log('Fetching initial organizations');
