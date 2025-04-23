@@ -7,7 +7,7 @@ import OrgModal from './OrgModal';
 function OrganizationsPage() {
   const [organizations, setOrganizations] = useState([]); // Loaded organizations
   const [currentPage, setCurrentPage] = useState(0); // Tracks the current page
-  const [currentSearch, setCurrentSearch] = useState(''); // Tracks the current page
+  const [currentSearch, setCurrentSearch] = useState(''); // Tracks the current search
   const [isLoading, setIsLoading] = useState(false); // Loading state for fetching data
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
   const [selectedOrganization, setSelectedOrganization] = useState(null); // Selected organization for the modal
