@@ -62,6 +62,7 @@ app.get('/api/Events', (req, res) => {
 app.get('/api/EventsPaginated', (req, res) => {
     const page = parseInt(req.query.page) || 0; // Default to page 0
     const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+    const search = req.query.search;
     const offset = page * limit;
 
     const sql = 'SELECT * FROM Events LIMIT ? OFFSET ?';
@@ -89,10 +90,11 @@ app.get('/api/StudentOrganizations', (req, res) => {
 app.get('/api/StudentOrganizationsPaginated', (req, res) => {
     const page = parseInt(req.query.page) || 0; // Default to page 0
     const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+    const search = '%2%';
     const offset = page * limit;
 
-    const sql = 'SELECT * FROM StudentOrganizations LIMIT ? OFFSET ?';
-    db.all(sql, [limit, offset], (err, rows) => {
+    const sql = 'SELECT * FROM StudentOrganizations WHERE name LIKE ? LIMIT ? OFFSET ?';
+    db.all(sql, [search, limit, offset], (err, rows) => {
         if (err) {
             res.status(400).json({ error: err.message });
             return;
