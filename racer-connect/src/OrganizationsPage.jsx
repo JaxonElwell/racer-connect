@@ -56,6 +56,9 @@ function OrganizationsPage() {
 
   const handleSearch = (e) => {
     setCurrentSearch(e.target.value);
+    setOrganizations([]);
+    setCurrentPage(0);
+    fetchOrganizations(currentPage, currentSearch);
   }
 
   useEffect(() => {
