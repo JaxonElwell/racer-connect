@@ -5,6 +5,9 @@ const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport');
 const authRoutes = require('./auth');
+const multer = require('multer');
+const csv = require('csv-parser');
+const fs = require('fs');
 
 // middleware
 app.use(cors({
@@ -34,6 +37,9 @@ const db = new sqlite3.Database('./devdb.sqlite', (err) => {
         console.log('Connected to SQLite database');
     }
 });
+
+// Configure multer for file uploads
+const upload = multer({ dest: 'uploads/' });
 
 // API endpoints
 // GET all event attendees
@@ -127,6 +133,43 @@ app.get('/api/StudentOrganizations/:id', (req, res) => {
             res.send(row);
         }
     });
+});
+
+// POST route to handle CSV upload for StudentOrganizations
+app.post('/api/UploadStudentOrganizations', upload.single('file'), (req, res) => {
+    const filePath = req.file.path;
+
+    const organizations = [];
+
+    fs.createReadStream(filePath)
+        .pipe(csv())
+        .on('data', (row) => {
+            organizations.push(row);
+        })
+        .on('end', () => {
+            const sql = `
+                INSERT INTO StudentOrganizations (name, category, president, president_email, advisor, advisor_email)
+                VALUES (?, ?, ?, ?, ?, ?)
+            `;
+
+            db.serialize(() => {
+                organizations.forEach((org) => {
+                    db.run(sql, [org.name, org.category, org.president, org.president_email, org.advisor, org.advisor_email], (err) => {
+                        if (err) {
+                            console.error('Error inserting organization:', err.message);
+                        }
+                    });
+                });
+            });
+
+            db.close();
+            fs.unlinkSync(filePath); // Delete the uploaded file
+            res.status(200).send('File processed successfully.');
+        })
+        .on('error', (err) => {
+            console.error('Error processing CSV file:', err.message);
+            res.status(500).send('Failed to process file.');
+        });
 });
 
 // POST new organization
