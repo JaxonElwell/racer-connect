@@ -20,7 +20,6 @@ Racer Connect is a capstone project for MSU CSC 530, designed to help students a
 - **Database**: SQLite3 (planned migration to Supabase)
 - **Authentication**: Passport.js with Google OAuth 2.0
 - **File Uploads**: Multer for handling CSV uploads
-- **API Testing**: Postman (for testing endpoints)
 
 ---
 

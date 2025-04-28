@@ -1,4 +1,8 @@
+import { useUser } from '../context/UserContext';
+
 function EventModal({ isOpen, onClose, event }) {
+  const { user } = useUser(); // Get the current user from context
+
   if (!isOpen || !event) return null;
 
   const formattedDate = new Date(event.event_date).toLocaleDateString('en-US', {
@@ -13,6 +17,37 @@ function EventModal({ isOpen, onClose, event }) {
     minute: '2-digit',
     hour12: true,
   });
+
+  const handleAddToCalendar = async () => {
+    if (!user) {
+      alert('You must be logged in to add events to your calendar.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/UserEvents', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user.id, // Pass the current user's ID
+          event_id: event.id, // Pass the event ID
+        }),
+      });
+
+      if (response.ok) {
+        alert('Event added to your calendar successfully!');
+      } else {
+        const error = await response.text();
+        console.error('Error adding event to calendar:', error);
+        alert('Failed to add event to calendar. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error adding event to calendar:', error);
+      alert('An error occurred. Please try again.');
+    }
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -65,10 +100,9 @@ function EventModal({ isOpen, onClose, event }) {
           </p>
         </div>
         <div className="mt-4 flex justify-end">
-          {/* Dummy Add to Calendar Button */}
           <button
             className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition duration-300"
-            onClick={() => console.log('Add to calendar clicked!')}
+            onClick={handleAddToCalendar}
           >
             Add to Calendar
           </button>
