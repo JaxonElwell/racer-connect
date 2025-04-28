@@ -5,6 +5,9 @@ const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport');
 const authRoutes = require('./auth');
+const multer = require('multer');
+const csv = require('csv-parser');
+const fs = require('fs');
 
 // middleware
 app.use(cors({
@@ -35,6 +38,9 @@ const db = new sqlite3.Database('./devdb.sqlite', (err) => {
     }
 });
 
+// Configure multer for file uploads
+const upload = multer({ dest: 'uploads/' });
+
 // API endpoints
 // GET all event attendees
 app.get('/api/EventAttendees', (req, res) => {
@@ -62,10 +68,11 @@ app.get('/api/Events', (req, res) => {
 app.get('/api/EventsPaginated', (req, res) => {
     const page = parseInt(req.query.page) || 0; // Default to page 0
     const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+    const search = req.query.search;
     const offset = page * limit;
 
-    const sql = 'SELECT * FROM Events LIMIT ? OFFSET ?';
-    db.all(sql, [limit, offset], (err, rows) => {
+    const sql = 'SELECT * FROM Events WHERE name LIKE ? LIMIT ? OFFSET ?';
+    db.all(sql, [search, limit, offset], (err, rows) => {
         if (err) {
             res.status(400).json({ error: err.message });
             return;
@@ -89,10 +96,11 @@ app.get('/api/StudentOrganizations', (req, res) => {
 app.get('/api/StudentOrganizationsPaginated', (req, res) => {
     const page = parseInt(req.query.page) || 0; // Default to page 0
     const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+    const search = req.query.search;
     const offset = page * limit;
 
-    const sql = 'SELECT * FROM StudentOrganizations LIMIT ? OFFSET ?';
-    db.all(sql, [limit, offset], (err, rows) => {
+    const sql = 'SELECT * FROM StudentOrganizations WHERE name LIKE ? LIMIT ? OFFSET ?';
+    db.all(sql, [search, limit, offset], (err, rows) => {
         if (err) {
             res.status(400).json({ error: err.message });
             return;
@@ -125,6 +133,43 @@ app.get('/api/StudentOrganizations/:id', (req, res) => {
             res.send(row);
         }
     });
+});
+
+// POST route to handle CSV upload for StudentOrganizations
+app.post('/api/UploadStudentOrganizations', upload.single('file'), (req, res) => {
+    const filePath = req.file.path;
+
+    const organizations = [];
+
+    fs.createReadStream(filePath)
+        .pipe(csv())
+        .on('data', (row) => {
+            organizations.push(row);
+        })
+        .on('end', () => {
+            const sql = `
+                INSERT INTO StudentOrganizations (name, category, president, president_email, advisor, advisor_email)
+                VALUES (?, ?, ?, ?, ?, ?)
+            `;
+
+            db.serialize(() => {
+                organizations.forEach((org) => {
+                    db.run(sql, [org.name, org.category, org.president, org.president_email, org.advisor, org.advisor_email], (err) => {
+                        if (err) {
+                            console.error('Error inserting organization:', err.message);
+                        }
+                    });
+                });
+            });
+
+            db.close();
+            fs.unlinkSync(filePath); // Delete the uploaded file
+            res.status(200).send('File processed successfully.');
+        })
+        .on('error', (err) => {
+            console.error('Error processing CSV file:', err.message);
+            res.status(500).send('Failed to process file.');
+        });
 });
 
 // POST new organization
@@ -163,6 +208,24 @@ app.post('/api/Events', (req, res) => {
             }
         });
     }
+});
+
+// POST - Register a user for an event
+app.post('/api/UserEvents', (req, res) => {
+    const { user_id, event_id } = req.body;
+    if (!user_id || !event_id) {
+        return res.status(400).send('user_id and event_id are required');
+    }
+
+    const sql = `INSERT INTO UserEvents (user_id, event_id) VALUES (?, ?)`;
+    db.run(sql, [user_id, event_id], function (err) {
+        if (err) {
+            console.error('Error registering for event:', err.message);
+            res.status(500).send('Failed to register for event');
+        } else {
+            res.status(201).json({ message: 'Event added to calendar' });
+        }
+    });
 });
 
 // PUT update organization by id
