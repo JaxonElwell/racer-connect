@@ -302,6 +302,21 @@ app.delete('/api/Events/:id', (req, res) => {
     });
 });
 
+// DELETE - Remove a user from an event
+app.delete('/api/UserEvents/:userId/:eventId', (req, res) => {
+    const { userId, eventId } = req.params;
+
+    const sql = `DELETE FROM UserEvents WHERE user_id = ? AND event_id = ?`;
+    db.run(sql, [userId, eventId], function (err) {
+        if (err) {
+            console.error('Error removing event from calendar:', err.message);
+            res.status(500).send('Failed to remove event from calendar');
+        } else {
+            res.status(200).send('Event removed from calendar');
+        }
+    });
+});
+
 // GET all events a user is registered for
 app.get('/api/UserEvents/:userId', (req, res) => {
     const { userId } = req.params;
