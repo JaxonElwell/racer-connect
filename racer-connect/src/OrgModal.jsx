@@ -20,10 +20,25 @@ export default function OrgModal({ isOpen, onClose, organization }) {
 
         {/* Modal Body */}
         <div className="p-8">
-          {organization.image && <img src={organization.image} alt={organization.name} className="mb-4 w-full h-auto rounded-lg" />}
+          {organization.image && (
+            <img
+              src={organization.image}
+              alt={organization.name}
+              className="mb-4 w-full h-auto rounded-lg"
+            />
+          )}
           <p className="mb-4">{organization.description}</p>
+
+          {/* President Information */}
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold">President</h3>
+            <p className="text-gray-700">{organization.president || 'Not available'}</p>
+            <p className="text-gray-500">{organization.president_email || 'Email not available'}</p>
+          </div>
+
+          {/* Miscellaneous Information */}
           <div>
-            <h3 className="text-xl font-semibold">Misc Info</h3>
+            <h3 className="text-lg font-semibold">Misc Info</h3>
             <p>{organization.miscInfo}</p>
           </div>
         </div>
