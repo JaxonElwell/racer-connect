@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Layout from './Layout';
 import OrgModal from './OrgModal';
 import SkeletonOrgCard from './Components/SkeletonOrgCard';
-// Import user context or state
-import { useUser } from './context/UserContext'; // Replace with your actual user context
+import { useUser } from './context/UserContext';
 
 function OrganizationsPage() {
   const [organizations, setOrganizations] = useState([]);
@@ -16,7 +15,7 @@ function OrganizationsPage() {
   const hasFetched = useRef(false);
 
   // Get the current user
-  const { user } = useUser(); // Replace with your actual user retrieval logic
+  const { user } = useUser();
 
   const fetchOrganizations = async (page, search) => {
     setIsLoading(true);
@@ -127,7 +126,7 @@ function OrganizationsPage() {
             isOpen={isModalOpen}
             onClose={handleCloseModal}
             organization={selectedOrganization}
-            user={user} // Pass the user object to the modal
+            user={user}
           />
         )}
       </div>
