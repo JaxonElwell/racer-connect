@@ -1,21 +1,22 @@
-// Using an image URL as a prop in the form step since we cannot easily upload images in this context.
 import React, { useState } from 'react';
 
-function FormStep3({ onSubmit, onBack }) {
+function FormStep3({ onNext, onBack }) {
   const [inviteType, setInviteType] = useState('');
-  const [imageUrl, setImageUrl] = useState(''); // State for the image URL
+  const [imageUrl, setImageUrl] = useState('');
 
-  const handleSubmit = () => {
+  const handleNext = () => {
     if (!inviteType) {
       alert('Please select who is invited.');
       return;
     }
-    onSubmit({ inviteType, image: imageUrl }); // Pass the image URL
+
+    onNext({ inviteType, image: imageUrl });
   };
 
   return (
     <div>
-      <h2>Step 3: Finalize Your Event</h2>
+      <h2 className="text-xl text-black font-bold mb-4">Finalize Your Event</h2>
+
       <label className="block mb-2 text-sm font-medium text-gray-700">
         Who is invited?
       </label>
@@ -48,7 +49,7 @@ function FormStep3({ onSubmit, onBack }) {
           Back
         </button>
         <button
-          onClick={handleSubmit}
+          onClick={handleNext}
           className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition duration-300"
         >
           Submit

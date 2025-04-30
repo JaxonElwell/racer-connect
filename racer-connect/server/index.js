@@ -81,6 +81,20 @@ app.get('/api/EventsPaginated', (req, res) => {
     });
 });
 
+// GET all events by organization id
+app.get('/api/OrganizationEvents/:organizationId', (req, res) => {
+    const { organizationId } = req.params;
+    const sql = `SELECT * FROM Events WHERE organization_id = ? ORDER BY event_date ASC`;
+    db.all(sql, [organizationId], (err, rows) => {
+      if (err) {
+        console.error('Error fetching organization events:', err.message);
+        res.status(500).send('Internal server error');
+      } else {
+        res.json({ events: rows });
+      }
+    });
+  });
+
 // GET all organizations
 app.get('/api/StudentOrganizations', (req, res) => {
     db.all('SELECT * FROM StudentOrganizations', [], (err, rows) => {
@@ -212,29 +226,29 @@ app.post('/api/StudentOrganizations', (req, res) => {
 // POST new event
 app.post('/api/Events', (req, res) => {
     const { organization_id, name, event_date, location, description, image } = req.body;
-
+  
     // Validate required fields
     if (!name || !event_date || !location) {
-        res.status(400).send('name, event_date, and location cannot be null');
-        return;
+      res.status(400).send('name, event_date, and location cannot be null');
+      return;
     }
-
+  
     const sql = `
-        INSERT INTO Events (organization_id, name, event_date, location, description, image)
-        VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO Events (organization_id, name, event_date, location, description, image)
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
-
+  
     // Use `null` for organization_id if it is not provided
     db.run(sql, [organization_id || null, name, event_date, location, description, image], function (err) {
-        if (err) {
-            console.error('Error creating event:', err.message);
-            res.status(500).send('Internal server error');
-        } else {
-            const id = this.lastID;
-            res.status(201).send({ id, organization_id, name, event_date, location, description, image });
-        }
+      if (err) {
+        console.error('Error creating event:', err.message);
+        res.status(500).send('Internal server error');
+      } else {
+        const id = this.lastID;
+        res.status(201).send({ id, organization_id, name, event_date, location, description, image });
+      }
     });
-});
+  });
 
 // POST - Register a user for an event
 app.post('/api/UserEvents', (req, res) => {

@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FormStep1 from './FormStep1';
 import FormStep2 from './FormStep2';
 import FormStep3 from './FormStep3';
 import ProgressBar from './ProgressBar';
 import Modal from '../components/Modal';
 
-function Form() {
+function Form({ onClose }) {
   const [currentStep, setCurrentStep] = useState(1);
+  const [formComplete, setFormComplete] = useState(false);
   const [formData, setFormData] = useState({
     host: '',
     organization: '',
@@ -16,24 +17,27 @@ function Form() {
     description: '',
     location: '',
     inviteType: '',
-    image: null,
+    image: '',
   });
-  const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+
+  const [modal, setModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+  });
 
   const handleNext = (data) => {
-    setFormData({ ...formData, ...data });
-    setCurrentStep(currentStep + 1);
+    setFormData((prev) => ({ ...prev, ...data }));
+    setCurrentStep((prev) => prev + 1);
   };
 
   const handleBack = () => {
-    setCurrentStep(currentStep - 1);
+    setCurrentStep((prev) => prev - 1);
   };
 
   const handleSubmit = async () => {
-    const eventDate = formData.startDate;
-    const eventTime = formData.startTime;
-    const eventDateTime = `${eventDate}T${eventTime}:00`;
-  
+    const eventDateTime = `${formData.startDate}T${formData.startTime}:00`;
+
     const eventData = {
       organization_id: formData.organization || null,
       name: formData.eventName,
@@ -41,10 +45,11 @@ function Form() {
       location: formData.location,
       description: formData.description,
       image: formData.image,
+      inviteType: formData.inviteType,
     };
-  
+
     console.log('Event Data:', eventData);
-  
+
     if (!eventData.name || !eventData.event_date || !eventData.location) {
       setModal({
         isOpen: true,
@@ -53,7 +58,7 @@ function Form() {
       });
       return;
     }
-  
+
     try {
       const response = await fetch('/api/Events', {
         method: 'POST',
@@ -62,15 +67,20 @@ function Form() {
         },
         body: JSON.stringify(eventData),
       });
-  
+
       if (response.ok) {
         const result = await response.json();
         console.log('Event created successfully:', result);
+
+        alert('Event created successfully!');
+
         setModal({
           isOpen: true,
           title: 'Success',
           message: 'Event created successfully!',
         });
+        setFormComplete(true);
+        onClose();
       } else {
         const error = await response.text();
         console.error('Error creating event:', error);
@@ -90,14 +100,23 @@ function Form() {
     }
   };
 
+  useEffect(() => {
+    if (currentStep === 4) {
+      handleSubmit();
+    }
+  }, [currentStep]);
+
   return (
     <div className="form-container">
-      <ProgressBar currentStep={currentStep} />
-      {currentStep === 1 && <FormStep1 onNext={handleNext} />}
-      {currentStep === 2 && <FormStep2 onNext={handleNext} onBack={handleBack} />}
-      {currentStep === 3 && <FormStep3 onSubmit={handleSubmit} onBack={handleBack} />}
+      {!formComplete && (
+        <>
+          <ProgressBar currentStep={currentStep} />
+          {currentStep === 1 && <FormStep1 onNext={handleNext} />}
+          {currentStep === 2 && <FormStep2 onNext={handleNext} onBack={handleBack} />}
+          {currentStep === 3 && <FormStep3 onNext={handleNext} onBack={handleBack} />}
+        </>
+      )}
 
-      {/* Modal */}
       {modal.isOpen && (
         <Modal
           title={modal.title}
