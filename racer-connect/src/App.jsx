@@ -5,6 +5,7 @@ import Form from './MultiPageForm/Form';
 import { useNavigate } from 'react-router-dom';
 import SkeletonEventCard from './Components/SkeletonEventCard';
 import EventModal from './Components/EventModal';
+import { useUser } from './context/UserContext';
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,8 +14,10 @@ function App() {
   const [selectedEvent, setSelectedEvent] = useState(null); // State for the selected event
   const [organizations, setOrganizations] = useState([]);
   const [events, setEvents] = useState([]); // Ensure initial state is an array
-  const [error, setError] = useState(null);
+  const [userEvents, setUserEvents] = useState([]); // State for user's registered events
   const [isLoadingEvents, setIsLoadingEvents] = useState(true); // Loading state for events
+  const [isLoadingUserEvents, setIsLoadingUserEvents] = useState(true); // Loading state for user events
+  const { user } = useUser(); // Get the current user
   const navigate = useNavigate();
 
   const goToStudentInfo = () => {
@@ -58,6 +61,19 @@ function App() {
       .finally(() => setIsLoadingEvents(false)); // Set loading to false
   }, []);
 
+  useEffect(() => {
+    if (user?.id) {
+      // Fetch user's registered events
+      fetch(`/api/UserEvents/${user.id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setUserEvents(data.events || []);
+        })
+        .catch((error) => console.error('Error fetching user events:', error))
+        .finally(() => setIsLoadingUserEvents(false));
+    }
+  }, [user]);
+
   const handleOpenEventModal = (event) => {
     setSelectedEvent(event);
     setIsModalOpen(true);
@@ -70,6 +86,16 @@ function App() {
 
   const handleCloseForm = () => {
     setIsFormOpen(false);
+  };
+
+  // Helper function to filter events that occur today or in the future
+  const filterFutureEvents = (events) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to midnight for accurate comparison
+    return events.filter((event) => {
+      const eventDate = new Date(event.event_date);
+      return eventDate >= today; // Include only events today or in the future
+    });
   };
 
   return (
@@ -130,58 +156,34 @@ function App() {
               // Show skeletons while loading
               [1, 2].map((key) => <SkeletonEventCard key={key} />)
             ) : (
-              (() => {
-                // Filter upcoming events
-                const filteredEvents = events.filter((event) => {
-                  const eventDate = new Date(event.event_date); // Parse the event date
-                  const today = new Date(); // Get today's date
-                  today.setHours(0, 0, 0, 0); // Reset time to midnight for accurate comparison
-                  return eventDate >= today; // Include only events today or in the future
-                });
-
-                // Check if there are any filtered events
-                if (filteredEvents.length === 0) {
-                  // Show skeletons if no upcoming events
-                  return [1, 2].map((key) => <SkeletonEventCard key={key} />);
-                }
-
-                // Render filtered events
-                return filteredEvents.slice(0, 2).map((event) => (
-                  <div
-                    key={event.id}
-                    className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105 cursor-pointer"
-                    onClick={() => handleOpenEventModal(event)} // Open modal on click
-                  >
-                    <img
-                      src={event.image || 'defaultEvent.jpg'}
-                      alt={event.name}
-                      className="rounded-lg w-20 h-20 mr-4"
-                    />
-                    <div>
-                      <h3 className="font-bold text-lg text-gray-900">{event.name}</h3>
-                      <p className="text-sm text-gray-700">{event.description}</p>
-                      <p className="text-sm text-gray-700">
-                        <strong>📅 {new Date(event.event_date).toLocaleDateString('en-US', {
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}</strong>
-                      </p>
-                      <p className="text-sm text-gray-700">
-                        <strong>⏰ {new Date(event.event_date).toLocaleTimeString('en-US', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          hour12: true,
-                        })}</strong>
-                      </p>
-                      <p className="text-sm text-gray-700">
-                        <strong>📍 {event.location}</strong>
-                      </p>
-                    </div>
+              filterFutureEvents(events).slice(0, 2).map((event) => (
+                <div
+                  key={event.id}
+                  className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105 cursor-pointer"
+                  onClick={() => handleOpenEventModal(event)} // Open modal on click
+                >
+                  <img
+                    src={event.image || 'defaultEvent.jpg'}
+                    alt={event.name}
+                    className="rounded-lg w-20 h-20 mr-4"
+                  />
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-900">{event.name}</h3>
+                    <p className="text-sm text-gray-700">{event.description}</p>
+                    <p className="text-sm text-gray-700">
+                      <strong>📅 {new Date(event.event_date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}</strong>
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      <strong>📍 {event.location}</strong>
+                    </p>
                   </div>
-                ));
-              })()
+                </div>
+              ))
             )}
           </div>
         </div>
@@ -192,49 +194,59 @@ function App() {
         <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-7xl">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-gray-900">My Events</h2>
+<<<<<<< HEAD
             <a href="#" className="text-gray-600 hover:underline"
               onClick={(e) => {
                 e.preventDefault(); // Prevent default anchor behavior
                 goToStudentInfo(); // Navigate to StudentInfo page
               }}>
+=======
+            <a
+              href="#"
+              className="text-gray-600 hover:underline"
+              onClick={(e) => {
+                e.preventDefault(); // Prevent default anchor behavior
+                goToStudentInfo(); // Navigate to StudentInfo page
+              }}
+            >
+>>>>>>> f6c23465807840dc68b2a529021142aa8a63f0e4
               See All
             </a>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105">
-              <img
-                src="bgClub.jpg"
-                alt="Event Thumbnail"
-                className="rounded-lg w-20 h-20 mr-4"
-              />
-              <div>
-                <h3 className="font-bold text-lg text-gray-900">Field Games and Giant Games</h3>
-                <p className="text-sm text-gray-700">Board Game Club</p>
-                <p className="text-sm text-gray-700">
-                  <strong>📅 September 18</strong>
-                </p>
-                <p className="text-sm text-gray-700">
-                  <strong>📍 Waterfield Breezeway</strong>
-                </p>
-              </div>
-            </div>
-            <div className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105">
-              <img
-                src="CASzBci.jpeg"
-                alt="Event Thumbnail"
-                className="rounded-lg w-20 h-20 mr-4"
-              />
-              <div>
-                <h3 className="font-bold text-lg text-gray-900">Best in the West #4</h3>
-                <p className="text-sm text-gray-700">Murray State Tournaments & Local Events</p>
-                <p className="text-sm text-gray-700">
-                  <strong>📅 January 26</strong>
-                </p>
-                <p className="text-sm text-gray-700">
-                  <strong>📍 Clark South Commons</strong>
-                </p>
-              </div>
-            </div>
+            {isLoadingUserEvents ? (
+              // Show skeletons while loading
+              [1, 2].map((key) => <SkeletonEventCard key={key} />)
+            ) : (
+              filterFutureEvents(userEvents).map((event) => (
+                <div
+                  key={event.id}
+                  className="bg-gray-100 rounded-lg p-4 flex items-center transform transition-transform duration-300 hover:scale-105 cursor-pointer"
+                  onClick={() => handleOpenEventModal(event)} // Open modal on click
+                >
+                  <img
+                    src={event.image || 'defaultEvent.jpg'}
+                    alt={event.name}
+                    className="rounded-lg w-20 h-20 mr-4"
+                  />
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-900">{event.name}</h3>
+                    <p className="text-sm text-gray-700">{event.description}</p>
+                    <p className="text-sm text-gray-700">
+                      <strong>📅 {new Date(event.event_date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}</strong>
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      <strong>📍 {event.location}</strong>
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

@@ -40,12 +40,12 @@ function Form() {
       event_date: eventDateTime,
       location: formData.location,
       description: formData.description,
-      image: formData.image, // Use the image URL
+      image: formData.image,
     };
   
     console.log('Event Data:', eventData);
   
-    if (!eventData.organization_id || !eventData.name || !eventData.event_date || !eventData.location) {
+    if (!eventData.name || !eventData.event_date || !eventData.location) {
       setModal({
         isOpen: true,
         title: 'Error',
@@ -60,7 +60,7 @@ function Form() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(eventData), // Send the image URL in the JSON
+        body: JSON.stringify(eventData),
       });
   
       if (response.ok) {

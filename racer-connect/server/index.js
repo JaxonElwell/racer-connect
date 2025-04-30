@@ -192,22 +192,66 @@ app.post('/api/StudentOrganizations', (req, res) => {
 });
 
 // POST new event
+// app.post('/api/Events', (req, res) => {
+//     const { organization_id, name, event_date, location, description, image } = req.body;
+//     if (!organization_id || !name || !event_date || !location) {
+//         res.status(400).send('organization_id, name, event_date, and location cannot be null');
+//     } else {
+//         const sql = 'INSERT INTO Events(organization_id, name, event_date, location, description, image) VALUES (?, ?, ?, ?, ?, ?)';
+//         db.run(sql, [organization_id, name, event_date, location, description, image], function (err) {
+//             if (err) {
+//                 console.error(err.message);
+//                 res.status(500).send('Internal server error');
+//             } else {
+//                 const id = this.lastID;
+//                 res.status(201).send({ id, organization_id, name, event_date, location, description, image });
+//             }
+//         });
+//     }
+// });
+// POST new event
 app.post('/api/Events', (req, res) => {
     const { organization_id, name, event_date, location, description, image } = req.body;
-    if (!organization_id || !name || !event_date || !location) {
-        res.status(400).send('organization_id, name, event_date, and location cannot be null');
-    } else {
-        const sql = 'INSERT INTO Events(organization_id, name, event_date, location, description, image) VALUES (?, ?, ?, ?, ?, ?)';
-        db.run(sql, [organization_id, name, event_date, location, description, image], function (err) {
-            if (err) {
-                console.error(err.message);
-                res.status(500).send('Internal server error');
-            } else {
-                const id = this.lastID;
-                res.status(201).send({ id, organization_id, name, event_date, location, description, image });
-            }
-        });
+
+    // Validate required fields
+    if (!name || !event_date || !location) {
+        res.status(400).send('name, event_date, and location cannot be null');
+        return;
     }
+
+    const sql = `
+        INSERT INTO Events (organization_id, name, event_date, location, description, image)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    // Use `null` for organization_id if it is not provided
+    db.run(sql, [organization_id || null, name, event_date, location, description, image], function (err) {
+        if (err) {
+            console.error('Error creating event:', err.message);
+            res.status(500).send('Internal server error');
+        } else {
+            const id = this.lastID;
+            res.status(201).send({ id, organization_id, name, event_date, location, description, image });
+        }
+    });
+});
+
+// POST - Register a user for an event
+app.post('/api/UserEvents', (req, res) => {
+    const { user_id, event_id } = req.body;
+    if (!user_id || !event_id) {
+        return res.status(400).send('user_id and event_id are required');
+    }
+
+    const sql = `INSERT INTO UserEvents (user_id, event_id) VALUES (?, ?)`;
+    db.run(sql, [user_id, event_id], function (err) {
+        if (err) {
+            console.error('Error registering for event:', err.message);
+            res.status(500).send('Failed to register for event');
+        } else {
+            res.status(201).json({ message: 'Event added to calendar' });
+        }
+    });
 });
 
 // POST - Register a user for an event
@@ -298,6 +342,21 @@ app.delete('/api/Events/:id', (req, res) => {
             res.status(404).send('Event not found');
         } else {
             res.status(204).send();
+        }
+    });
+});
+
+// DELETE - Remove a user from an event
+app.delete('/api/UserEvents/:userId/:eventId', (req, res) => {
+    const { userId, eventId } = req.params;
+
+    const sql = `DELETE FROM UserEvents WHERE user_id = ? AND event_id = ?`;
+    db.run(sql, [userId, eventId], function (err) {
+        if (err) {
+            console.error('Error removing event from calendar:', err.message);
+            res.status(500).send('Failed to remove event from calendar');
+        } else {
+            res.status(200).send('Event removed from calendar');
         }
     });
 });
