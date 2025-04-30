@@ -194,13 +194,6 @@ function App() {
         <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-7xl">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-gray-900">My Events</h2>
-<<<<<<< HEAD
-            <a href="#" className="text-gray-600 hover:underline"
-              onClick={(e) => {
-                e.preventDefault(); // Prevent default anchor behavior
-                goToStudentInfo(); // Navigate to StudentInfo page
-              }}>
-=======
             <a
               href="#"
               className="text-gray-600 hover:underline"
@@ -209,7 +202,6 @@ function App() {
                 goToStudentInfo(); // Navigate to StudentInfo page
               }}
             >
->>>>>>> f6c23465807840dc68b2a529021142aa8a63f0e4
               See All
             </a>
           </div>

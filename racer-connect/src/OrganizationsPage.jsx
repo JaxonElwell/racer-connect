@@ -6,36 +6,15 @@ import SkeletonOrgCard from './Components/SkeletonOrgCard';
 import { useUser } from './context/UserContext'; // Replace with your actual user context
 
 function OrganizationsPage() {
-<<<<<<< HEAD
-  const [organizations, setOrganizations] = useState([]); // Loaded organizations
-  const [currentPage, setCurrentPage] = useState(0); // Tracks the current page
-  const [currentSearch, setCurrentSearch] = useState(''); // Tracks the current search
-  const [isLoading, setIsLoading] = useState(false); // Loading state for fetching data
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
-  const [selectedOrganization, setSelectedOrganization] = useState(null); // Selected organization for the modal
-=======
   const [organizations, setOrganizations] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [currentSearch, setCurrentSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrganization, setSelectedOrganization] = useState(null);
->>>>>>> f6c23465807840dc68b2a529021142aa8a63f0e4
 
   const hasFetched = useRef(false);
 
-<<<<<<< HEAD
-  const fetchOrganizations = async (page, search) => {
-    setIsLoading(true);
-    try {
-      console.log(`Fetching page: ${page}`); // Debugging
-      if(!search) { // Set Search
-        search = '%';
-      } else {
-        search = '%' + search + '%';
-      }
-      const response = await fetch(`/api/StudentOrganizationsPaginated?page=${page}&limit=10&search=${search}`); // Fetch 10 organizations (2 rows)
-=======
   // Get the current user
   const { user } = useUser(); // Replace with your actual user retrieval logic
 
@@ -46,7 +25,6 @@ function OrganizationsPage() {
       else search = `%${search}%`;
 
       const response = await fetch(`/api/StudentOrganizationsPaginated?page=${page}&limit=10&search=${search}`);
->>>>>>> f6c23465807840dc68b2a529021142aa8a63f0e4
       const data = await response.json();
       if (Array.isArray(data.data)) {
         setOrganizations((prev) => [...prev, ...data.data]);
@@ -79,13 +57,8 @@ function OrganizationsPage() {
   const handleSearch = () => {
     setOrganizations([]);
     setCurrentPage(0);
-<<<<<<< HEAD
-    fetchOrganizations(currentPage, currentSearch);
-  }
-=======
     fetchOrganizations(0, currentSearch);
   };
->>>>>>> f6c23465807840dc68b2a529021142aa8a63f0e4
 
   useEffect(() => {
     if (!hasFetched.current) {
@@ -104,11 +77,7 @@ function OrganizationsPage() {
           <input
             type="text"
             value={currentSearch}
-<<<<<<< HEAD
-            onChange={(e) => {setCurrentSearch(e.target.value)}}
-=======
             onChange={(e) => setCurrentSearch(e.target.value)}
->>>>>>> f6c23465807840dc68b2a529021142aa8a63f0e4
             placeholder="Search organizations..."
             className="border bg-white border-gray-300 rounded-lg p-2 w-full max-w-md text-black"
           />

@@ -1,17 +1,9 @@
 import { useUser } from '../context/UserContext';
-<<<<<<< HEAD
-
-function EventModal({ isOpen, onClose, event }) {
-  const { user } = useUser(); // Get the current user from context
-
-  if (!isOpen || !event) return null;
-=======
 import { useState, useEffect } from 'react';
 
 function EventModal({ isOpen, onClose, event }) {
   const { user } = useUser(); // Get the current user from context
   const [isRegistered, setIsRegistered] = useState(false); // Track if the user is registered for the event
->>>>>>> f6c23465807840dc68b2a529021142aa8a63f0e4
 
   // Format the event date and time
   const formattedDate = event
@@ -107,37 +99,6 @@ function EventModal({ isOpen, onClose, event }) {
     return null;
   }
 
-  const handleAddToCalendar = async () => {
-    if (!user) {
-      alert('You must be logged in to add events to your calendar.');
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/UserEvents', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: user.id, // Pass the current user's ID
-          event_id: event.id, // Pass the event ID
-        }),
-      });
-
-      if (response.ok) {
-        alert('Event added to your calendar successfully!');
-      } else {
-        const error = await response.text();
-        console.error('Error adding event to calendar:', error);
-        alert('Failed to add event to calendar. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error adding event to calendar:', error);
-      alert('An error occurred. Please try again.');
-    }
-  };
-
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       {/* Background Overlay */}
@@ -166,38 +127,6 @@ function EventModal({ isOpen, onClose, event }) {
           />
         </svg>
 
-<<<<<<< HEAD
-        <div className="flex items-center mb-4">
-          <img
-            src={event.image || 'defaultEvent.jpg'} // Use the image URL or fallback to default
-            alt={event.name}
-            className="rounded-lg w-20 h-20 mr-4"
-          />
-          <div>
-            <h3 className="font-bold text-lg text-gray-900">{event.name}</h3>
-            <p className="text-sm text-gray-700">{event.description}</p>
-          </div>
-        </div>
-        <div className="text-sm text-gray-700">
-          <p>
-            <strong>📅 Date:</strong> {formattedDate}
-          </p>
-          <p>
-            <strong>⏰ Time:</strong> {formattedTime}
-          </p>
-          <p>
-            <strong>📍 Location:</strong> {event.location}
-          </p>
-        </div>
-        <div className="mt-4 flex justify-end">
-          <button
-            className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition duration-300"
-            onClick={handleAddToCalendar}
-          >
-            Add to Calendar
-          </button>
-        </div>
-=======
         {event && (
           <>
             <div className="flex items-center mb-4">
