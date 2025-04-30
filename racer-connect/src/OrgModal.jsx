@@ -1,6 +1,85 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-export default function OrgModal({ isOpen, onClose, organization }) {
+export default function OrgModal({ isOpen, onClose, organization, user }) {
+  const [isMember, setIsMember] = useState(false); // Track if the user is part of the organization
+
+  // Check if the user is part of the organization
+  useEffect(() => {
+    if (user && organization) {
+      fetch(`/api/UserOrganizations/${user.id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          const member = data.organizations.some((org) => org.id === organization.id);
+          setIsMember(member);
+        })
+        .catch((error) => console.error('Error checking membership:', error));
+    }
+  }, [user, organization]);
+
+  const handleJoinOrganization = async () => {
+    if (!user) {
+      alert('You must be logged in to join an organization.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/UserOrganizations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          organization_id: organization.id,
+        }),
+      });
+
+      if (response.ok) {
+        alert('You have successfully joined the organization!');
+        setIsMember(true); // Update the state to reflect the membership
+      } else {
+        const error = await response.text();
+        console.error('Error joining organization:', error);
+        alert('Failed to join the organization. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error joining organization:', error);
+      alert('An error occurred. Please try again.');
+    }
+  };
+
+  const handleLeaveOrganization = async () => {
+    if (!user) {
+      alert('You must be logged in to leave an organization.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/UserOrganizations', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          organization_id: organization.id,
+        }),
+      });
+
+      if (response.ok) {
+        alert('You have successfully left the organization!');
+        setIsMember(false); // Update the state to reflect the removal
+      } else {
+        const error = await response.text();
+        console.error('Error leaving organization:', error);
+        alert('Failed to leave the organization. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error leaving organization:', error);
+      alert('An error occurred. Please try again.');
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -36,10 +115,23 @@ export default function OrgModal({ isOpen, onClose, organization }) {
             <p className="text-gray-500">{organization.president_email || 'Email not available'}</p>
           </div>
 
-          {/* Miscellaneous Information */}
-          <div>
-            <h3 className="text-lg font-semibold">Misc Info</h3>
-            <p>{organization.miscInfo}</p>
+          {/* Join/Leave Button */}
+          <div className="mt-4 flex justify-end">
+            {isMember ? (
+              <button
+                className="bg-red-500 text-white font-bold py-2 px-4 rounded hover:bg-red-600 transition duration-300"
+                onClick={handleLeaveOrganization}
+              >
+                Leave Organization
+              </button>
+            ) : (
+              <button
+                className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition duration-300"
+                onClick={handleJoinOrganization}
+              >
+                Join Organization
+              </button>
+            )}
           </div>
         </div>
       </div>
