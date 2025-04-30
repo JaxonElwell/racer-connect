@@ -192,22 +192,48 @@ app.post('/api/StudentOrganizations', (req, res) => {
 });
 
 // POST new event
+// app.post('/api/Events', (req, res) => {
+//     const { organization_id, name, event_date, location, description, image } = req.body;
+//     if (!organization_id || !name || !event_date || !location) {
+//         res.status(400).send('organization_id, name, event_date, and location cannot be null');
+//     } else {
+//         const sql = 'INSERT INTO Events(organization_id, name, event_date, location, description, image) VALUES (?, ?, ?, ?, ?, ?)';
+//         db.run(sql, [organization_id, name, event_date, location, description, image], function (err) {
+//             if (err) {
+//                 console.error(err.message);
+//                 res.status(500).send('Internal server error');
+//             } else {
+//                 const id = this.lastID;
+//                 res.status(201).send({ id, organization_id, name, event_date, location, description, image });
+//             }
+//         });
+//     }
+// });
+// POST new event
 app.post('/api/Events', (req, res) => {
     const { organization_id, name, event_date, location, description, image } = req.body;
-    if (!organization_id || !name || !event_date || !location) {
-        res.status(400).send('organization_id, name, event_date, and location cannot be null');
-    } else {
-        const sql = 'INSERT INTO Events(organization_id, name, event_date, location, description, image) VALUES (?, ?, ?, ?, ?, ?)';
-        db.run(sql, [organization_id, name, event_date, location, description, image], function (err) {
-            if (err) {
-                console.error(err.message);
-                res.status(500).send('Internal server error');
-            } else {
-                const id = this.lastID;
-                res.status(201).send({ id, organization_id, name, event_date, location, description, image });
-            }
-        });
+
+    // Validate required fields
+    if (!name || !event_date || !location) {
+        res.status(400).send('name, event_date, and location cannot be null');
+        return;
     }
+
+    const sql = `
+        INSERT INTO Events (organization_id, name, event_date, location, description, image)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    // Use `null` for organization_id if it is not provided
+    db.run(sql, [organization_id || null, name, event_date, location, description, image], function (err) {
+        if (err) {
+            console.error('Error creating event:', err.message);
+            res.status(500).send('Internal server error');
+        } else {
+            const id = this.lastID;
+            res.status(201).send({ id, organization_id, name, event_date, location, description, image });
+        }
+    });
 });
 
 // POST - Register a user for an event

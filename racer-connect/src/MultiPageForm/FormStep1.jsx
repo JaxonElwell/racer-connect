@@ -1,5 +1,5 @@
 // IMPORTANT
-// CURRENT SETTING THE ORGANIZATION ID TO 1 IF "ME" IS SELECTED
+// Line 41 has dummy information. Replace it with the actual data from the database.
 
 import React, { useState } from 'react';
 
@@ -8,8 +8,8 @@ function FormStep1({ onNext }) {
   const [organization, setOrganization] = useState('');
 
   const handleNext = () => {
-    // Automatically set organization ID to 1 if "Me" is selected
-    const selectedOrganization = host === 'Me' ? '1' : organization;
+    // Set organization_id to null if "Me" is selected
+    const selectedOrganization = host === 'Me' ? null : organization;
 
     if (host === 'My Organization' && !organization) {
       alert('Please select an organization.');
