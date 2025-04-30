@@ -241,7 +241,6 @@ function EventModal({ isOpen, onClose, event }) {
             </div>
           </>
         )}
->>>>>>> f6c23465807840dc68b2a529021142aa8a63f0e4
       </div>
     </div>
   );
