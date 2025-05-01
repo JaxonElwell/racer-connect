@@ -268,24 +268,6 @@ app.post('/api/UserEvents', (req, res) => {
     });
 });
 
-// POST - Register a user for an event
-app.post('/api/UserEvents', (req, res) => {
-    const { user_id, event_id } = req.body;
-    if (!user_id || !event_id) {
-        return res.status(400).send('user_id and event_id are required');
-    }
-
-    const sql = `INSERT INTO UserEvents (user_id, event_id) VALUES (?, ?)`;
-    db.run(sql, [user_id, event_id], function (err) {
-        if (err) {
-            console.error('Error registering for event:', err.message);
-            res.status(500).send('Failed to register for event');
-        } else {
-            res.status(201).json({ message: 'Event added to calendar' });
-        }
-    });
-});
-
 // PUT update organization by id
 app.put('/api/StudentOrganizations/:id', (req, res) => {
     const { id } = req.params;
