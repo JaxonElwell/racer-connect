@@ -8,12 +8,9 @@ const StudentInfo = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const [organizations, setOrganizations] = useState([]);
-  const [events] = useState([
-    { id: 1, name: 'Tech Talk - AI in 2025', date: '2025-04-20' },
-    { id: 2, name: 'Hackathon', date: '2025-05-01' },
-  ]);
+  const [events, setEvents] = useState([]);
 
-  // Fetch user's joined orgs
+  // Fetch user's joined orgs and events
   useEffect(() => {
     if (user?.id) {
       axios
@@ -23,6 +20,15 @@ const StudentInfo = () => {
         })
         .catch((err) => {
           console.error('Error fetching user organizations:', err);
+        });
+
+      axios
+        .get(`/api/UserEvents/${user.id}`)
+        .then((res) => {
+          setEvents(res.data.events || []);
+        })
+        .catch((err) => {
+          console.error('Error fetching user events:', err);
         });
     }
   }, [user]);
@@ -85,7 +91,9 @@ const StudentInfo = () => {
                 {events.map((event) => (
                   <li key={event.id}>
                     <span className="font-medium">{event.name}</span> —{' '}
-                    <span className="text-sm text-gray-500 ml-1">{event.date}</span>
+                    <span className="text-sm text-gray-500 ml-1">
+                      {new Date(event.event_date).toLocaleDateString()}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -93,10 +101,8 @@ const StudentInfo = () => {
               <p className="text-gray-600 italic">No events signed up yet.</p>
             )}
             <button
-              onClick={() => {}}
-              disabled
-              className="text-sm text-blue-400 hover:underline mt-2 cursor-not-allowed"
-              title="Coming soon"
+              onClick={() => navigate('/EventsPage')}
+              className="text-sm text-blue-600 hover:underline mt-2"
             >
               View all upcoming events
             </button>
